@@ -7,16 +7,27 @@ class Products extends StatelessWidget {
     print("[Products Widget] constructor");
   }
 
+  Card _singleProductConstructor({String text, String imagePath}) {
+    return Card(
+      child: Column(
+        children: <Widget>[
+          // Image.asset(imagePath),
+          Text(text),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     print("[Products Widget] build()");
     return Column(
-        children: products
-            .map((element) => Card(
-                    child: Column(children: <Widget>[
-                  Image.asset('assets/food.jpeg'),
-                  Text(element)
-                ])))
-            .toList());
+      children: products
+          .map(
+            (element) => _singleProductConstructor(
+                text: element, imagePath: 'assets/food.jpeg'),
+          )
+          .toList(),
+    );
   }
 }

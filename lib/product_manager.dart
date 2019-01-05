@@ -33,12 +33,18 @@ class _ProductManagerState extends State<ProductManager> {
     super.didUpdateWidget(oldWidget);
   }
 
+  void _addProduct(String product) {
+    setState(() {
+      _products.add(product);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     print("[_ProductManagerState Widget] build()");
     return Column(children: [
       Container(
-        child: ProductControl(),
+        child: ProductControl(_addProduct),
         margin: EdgeInsets.all(10.0),
       ),
       Products(_products)
