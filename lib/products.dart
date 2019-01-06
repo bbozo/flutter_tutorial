@@ -7,7 +7,7 @@ class Products extends StatelessWidget {
     print("[Products Widget] constructor");
   }
 
-  Card _singleProductConstructor({String text, String imagePath}) {
+  Card _buildProduct({String text, String imagePath}) {
     return Card(
       child: Column(
         children: <Widget>[
@@ -21,10 +21,10 @@ class Products extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     print("[Products Widget] build()");
-    return Column(
+    return ListView(
       children: products
           .map(
-            (element) => _singleProductConstructor(
+            (element) => _buildProduct(
                 text: element, imagePath: 'assets/food.jpeg'),
           )
           .toList(),

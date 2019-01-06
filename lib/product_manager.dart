@@ -41,13 +41,19 @@ class _ProductManagerState extends State<ProductManager> {
 
   @override
   Widget build(BuildContext context) {
-    print("[_ProductManagerState Widget] build()");
-    return Column(children: [
-      Container(
-        child: ProductControl(_addProduct),
-        margin: EdgeInsets.all(10.0),
-      ),
-      Products(_products)
-    ]);
+    // NOTE: Products returns a ListView, a ListView can't be used below another widget
+    // (the container with the button/ProductController). We wrap the Products ListView into
+    // a container of it's own. Container is fixed in size, Expandable is the way to go.    
+    return Column(
+      children: [
+        Container(
+          child: ProductControl(_addProduct),
+          margin: EdgeInsets.all(10.0),
+        ),
+        Expanded(
+          child: Products(_products)
+        ) // Expanded is a container that expands to full size
+      ],
+    );
   }
 }
