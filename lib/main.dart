@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
       // debugShowMaterialGrid: true, // shows a grid in which material positions objects
       home: Scaffold(
         appBar: AppBar(title: Text('EasyList')),
-        body: ProductManager(startingProduct: "Food Tester"),
+        body: ProductManager(),
       ),
       theme: ThemeData(
           primarySwatch: Colors.deepOrange,
