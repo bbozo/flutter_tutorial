@@ -41,6 +41,12 @@ class _ProductManagerState extends State<ProductManager> {
     });
   }
 
+  void _deleteProduct(int index) {
+    setState(() {
+      _products.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     // NOTE: Products returns a ListView, a ListView can't be used below another widget
@@ -53,7 +59,7 @@ class _ProductManagerState extends State<ProductManager> {
           margin: EdgeInsets.all(10.0),
         ),
         Expanded(
-          child: Products(_products)
+          child: Products(_products, deleteProduct: _deleteProduct)
         ) // Expanded is a container that expands to full size
       ],
     );
