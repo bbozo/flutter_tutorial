@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/pages/product.dart';
 import 'package:flutter_tutorial/pages/product_admin.dart';
 import 'package:flutter_tutorial/pages/products.dart';
 // import 'package:flutter/rendering.dart';
@@ -24,7 +25,23 @@ class MyApp extends StatelessWidget {
           brightness: Brightness.light),
       routes: {
         '/': (BuildContext context) => ProductsPage(),
-        '/admin': (BuildContext context) => ProductAdminPage()
+        '/admin': (BuildContext context) => ProductAdminPage(),
+        // '/product': (BuildContext context) => ProductPage(),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        final List<String> pathElements = settings.name.split('/');
+
+        if (pathElements[0] != '') return null;
+
+        if (pathElements[1] == 'product') {
+          final int index = int.parse(pathElements[2]);
+          return MaterialPageRoute(
+            builder: (BuildContext context) =>
+                ProductPage(product['title'], product['image']),
+          );
+        }
+
+        return null;
       },
     );
   }
