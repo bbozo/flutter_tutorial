@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/pages/product_admin.dart';
+import 'package:flutter_tutorial/pages/products.dart';
 // import 'package:flutter/rendering.dart';
 
 import './pages/auth.dart';
@@ -15,11 +17,15 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // debugShowMaterialGrid: true, // shows a grid in which material positions objects
-      home: AuthPage(),
+      // home: AuthPage(),
       theme: ThemeData(
           primarySwatch: Colors.deepOrange,
           accentColor: Colors.deepPurple,
           brightness: Brightness.light),
+      routes: {
+        '/': (BuildContext context) => ProductsPage(),
+        '/admin': (BuildContext context) => ProductAdminPage()
+      },
     );
   }
 }
