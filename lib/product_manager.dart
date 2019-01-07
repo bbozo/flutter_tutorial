@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
 
 import './products.dart';
-import './product_control.dart';
 
 class ProductManager extends StatelessWidget {
-  final List<Map<String, String>> products;
-  final Function addProduct;
-  final Function deleteProduct;
+  final List<Map<String, dynamic>> products;
 
-  ProductManager(this.products, this.addProduct, this.deleteProduct);
+  ProductManager(this.products);
 
   @override
   Widget build(BuildContext context) {
@@ -17,12 +14,8 @@ class ProductManager extends StatelessWidget {
     // a container of it's own. Container is fixed in size, Expandable is the way to go.    
     return Column(
       children: [
-        Container(
-          child: ProductControl(addProduct),
-          margin: EdgeInsets.all(10.0),
-        ),
         Expanded(
-          child: Products(products, deleteProduct: deleteProduct)
+          child: Products(products)
         ) // Expanded is a container that expands to full size
       ],
     );
