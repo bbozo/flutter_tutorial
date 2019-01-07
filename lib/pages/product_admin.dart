@@ -16,10 +16,9 @@ class ProductAdminPage extends StatelessWidget {
               ListTile(
                 title: Text('All Products'),
                 onTap: () {
-                  Navigator.pushReplacement(
+                  Navigator.pushReplacementNamed(
                       context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => ProductsPage()));
+                      '/product');
                 },
               ),
             ],
