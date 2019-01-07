@@ -13,7 +13,29 @@ void main() {
   runApp(MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() {
+    return new _MyAppState();
+  }
+}
+
+class _MyAppState extends State<MyApp> {
+  List<Map<String, String>> _products = [];
+
+
+  void _addProduct(Map<String, String> product) {
+    setState(() {
+      _products.add(product);
+    });
+  }
+
+  void _deleteProduct(int index) {
+    setState(() {
+      _products.removeAt(index);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -24,7 +46,7 @@ class MyApp extends StatelessWidget {
           accentColor: Colors.deepPurple,
           brightness: Brightness.light),
       routes: {
-        '/': (BuildContext context) => ProductsPage(),
+        '/': (BuildContext context) => ProductsPage(_products, _addProduct, _deleteProduct),
         '/admin': (BuildContext context) => ProductAdminPage(),
         // '/product': (BuildContext context) => ProductPage(),
       },
@@ -35,6 +57,8 @@ class MyApp extends StatelessWidget {
 
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
+          Map<String, String> product = _products[index];
+
           return MaterialPageRoute(
             builder: (BuildContext context) =>
                 ProductPage(product['title'], product['image']),
