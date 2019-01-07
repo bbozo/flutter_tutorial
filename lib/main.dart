@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 // import 'package:flutter/rendering.dart';
 
-import './pages/home.dart';
+import './pages/auth.dart';
 
 void main() {
   // debugPaintSizeEnabled = true;  // shows how and why elements fit together
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       // debugShowMaterialGrid: true, // shows a grid in which material positions objects
-      home: HomePage(),
+      home: AuthPage(),
       theme: ThemeData(
           primarySwatch: Colors.deepOrange,
           accentColor: Colors.deepPurple,
