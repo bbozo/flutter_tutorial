@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tutorial/pages/products.dart';
 
 class ProductCreatePage extends StatefulWidget {
   final Function addProduct;
@@ -13,9 +12,9 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String titleValue = '';
-  double priceValue = 0.0;
-  String descriptionValue = '';
+  String _titleValue = '';
+  double _priceValue = 0.0;
+  String _descriptionValue = '';
 
   @override
   Widget build(BuildContext context) {
@@ -25,30 +24,17 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
         children: <Widget>[
           TextField(
             decoration: InputDecoration(labelText: 'Product Title'),
-            onChanged: (String value) {
-              setState(() {
-                titleValue = value;
-              });
-            },
+            onChanged: (String value) => setState(() => _titleValue = value),
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Product Description'),
             maxLines: 4,
-            onChanged: (String value) {
-              setState(() {
-                descriptionValue = value;
-              });
-            },
+            onChanged: (String value) => setState(() => _descriptionValue = value),
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Product Price'),
             keyboardType: TextInputType.number,
-            onChanged: (String value) {
-              setState(() {
-                priceValue = double.parse(value);
-              });
-            },
-          ),
+            onChanged: (String value) => setState(() => _priceValue = double.parse(value))),
           SizedBox(height: 10.0),
           RaisedButton(
             child: Text('Save'),
@@ -56,13 +42,13 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             textColor: Colors.white,
             onPressed: () {
               final Map<String, dynamic> product = {
-                'title': titleValue,
-                'description': descriptionValue,
-                'price': priceValue,
+                'title': _titleValue,
+                'description': _descriptionValue,
+                'price': _priceValue,
                 'image': 'assets/food.jpeg'
               };
               widget.addProduct(product);
-              Navigator.pushNamed(context, '/');
+              Navigator.pushNamed(context, '/product');
             },
           )
         ],

@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
           brightness: Brightness.light),
       routes: {
         '/': (BuildContext context) =>
-            ProductsPage(_products),
+            AuthPage(),
         '/product': (BuildContext context) => ProductsPage(_products),
         '/admin': (BuildContext context) => ProductAdminPage(_addProduct, _deleteProduct),
       },
