@@ -19,6 +19,13 @@ class AuthPageState extends State<AuthPage> {
       appBar: AppBar(title: Text('Login')),
       body: Container(
         margin: EdgeInsets.all(10.0),
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            fit: BoxFit.cover,
+            colorFilter: ColorFilter.mode(Colors.black.withOpacity(.3), BlendMode.dstATop),
+            image: AssetImage('assets/background.jpg'),
+          ),
+        ),
         child: ListView(
           children: <Widget>[
             TextField(
@@ -40,7 +47,8 @@ class AuthPageState extends State<AuthPage> {
             SwitchListTile(
                 title: Text('Accept terms'),
                 value: _acceptTerms,
-                onChanged: (bool value) => setState(() => _acceptTerms = value)),
+                onChanged: (bool value) =>
+                    setState(() => _acceptTerms = value)),
             SizedBox(height: 10.00),
             RaisedButton(
               child: Text("LOG IN"),
