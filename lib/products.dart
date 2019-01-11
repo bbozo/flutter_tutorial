@@ -22,10 +22,23 @@ class Products extends StatelessWidget {
               children: <Widget>[
                 Text(
                   product['title'],
-                  style: TextStyle(fontSize: 26.0, fontWeight: FontWeight.bold, fontFamily: 'Oswald'),
+                  style: TextStyle(
+                      fontSize: 26.0,
+                      fontWeight: FontWeight.bold,
+                      fontFamily: 'Oswald'),
                 ),
                 SizedBox(width: 8.0),
-                Text(product['price'].toString())
+                Container(
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).accentColor,
+                    borderRadius: BorderRadius.circular(5.0),
+                  ),
+                  padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                  child: Text(
+                    '\$${product['price'].toString()}',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                )
               ],
             ),
           ),
