@@ -18,6 +18,7 @@ class ProductAdminPage extends StatelessWidget {
             children: <Widget>[
               AppBar(title: Text('Choose'), automaticallyImplyLeading: false),
               ListTile(
+                leading: Icon(Icons.shop),
                 title: Text('All Products'),
                 onTap: () {
                   Navigator.pushReplacementNamed(
