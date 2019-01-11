@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/pages/product.dart';
 import 'package:flutter_tutorial/pages/product_admin.dart';
 import 'package:flutter_tutorial/pages/products.dart';
-import 'package:flutter/rendering.dart';
+// import 'package:flutter/rendering.dart';
 
 import './pages/auth.dart';
 
 void main() {
-  debugPaintSizeEnabled = true;  // shows how and why elements fit together
+  // debugPaintSizeEnabled = true;  // shows how and why elements fit together
   // debugPaintBaselinesEnabled = true; // shows baselines of texts, not sure when useful
   // debugPaintPointersEnabled = true;  // shows point-click-gesture events
   runApp(MyApp());
