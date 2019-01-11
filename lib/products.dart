@@ -33,7 +33,8 @@ class Products extends StatelessWidget {
                     color: Theme.of(context).accentColor,
                     borderRadius: BorderRadius.circular(5.0),
                   ),
-                  padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
+                  padding:
+                      EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
                   child: Text(
                     '\$${product['price'].toString()}',
                     style: TextStyle(color: Colors.white),
