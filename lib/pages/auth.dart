@@ -11,6 +11,7 @@ class AuthPageState extends State<AuthPage> {
   String _emailValue = '';
   String _passwordValue = '';
   bool _showPasswordValue = false;
+  bool _acceptTerms = false;
 
   @override
   Widget build(BuildContext context) {
@@ -26,15 +27,20 @@ class AuthPageState extends State<AuthPage> {
               onChanged: (String value) => setState(() => _emailValue = value),
             ),
             TextField(
-              decoration: InputDecoration(labelText: 'Password'),
-              obscureText: !_showPasswordValue,
-              onChanged: (String value) => setState(() => _passwordValue = value),
-            ),
+                decoration: InputDecoration(labelText: 'Password'),
+                obscureText: !_showPasswordValue,
+                onChanged: (String value) =>
+                    setState(() => _passwordValue = value)),
             CheckboxListTile(
               title: Text('Show password'),
               value: _showPasswordValue,
-              onChanged: (bool value) => setState(() => _showPasswordValue = value),
+              onChanged: (bool value) =>
+                  setState(() => _showPasswordValue = value),
             ),
+            SwitchListTile(
+                title: Text('Accept terms'),
+                value: _acceptTerms,
+                onChanged: (bool value) => setState(() => _acceptTerms = value)),
             SizedBox(height: 10.00),
             RaisedButton(
               child: Text("LOG IN"),
