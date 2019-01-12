@@ -45,8 +45,6 @@ class AuthPageState extends State<AuthPage> {
                   SizedBox(height: 10.00),
                   RaisedButton(
                     child: Text("LOG IN"),
-                    color: Theme.of(context).primaryColor,
-                    textColor: Colors.white,
                     onPressed: _submitForm,
                   ),
                 ],

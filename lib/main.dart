@@ -59,10 +59,7 @@ class _MyAppState extends State<MyApp> {
     return MaterialApp(
       // debugShowMaterialGrid: true, // shows a grid in which material positions objects
       // home: AuthPage(),
-      theme: ThemeData(
-          primarySwatch: Colors.deepOrange,
-          accentColor: Colors.deepPurple,
-          brightness: Brightness.light),
+      theme: _buildThemeData(),
       routes: {
         '/': (BuildContext context) => AuthPage(),
         '/product': (BuildContext context) => ProductsPage(_products),
@@ -91,6 +88,18 @@ class _MyAppState extends State<MyApp> {
           builder: (BuildContext context) => ProductsPage(_products),
         );
       },
+    );
+  }
+
+  ThemeData _buildThemeData() {
+    return ThemeData(
+      primarySwatch: Colors.deepOrange,
+      accentColor: Colors.deepPurple,
+      buttonColor: Colors.deepPurple,
+      brightness: Brightness.light,
+      buttonTheme: ButtonThemeData(
+        textTheme: ButtonTextTheme.primary,
+      ),
     );
   }
 }
