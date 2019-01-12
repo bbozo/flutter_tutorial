@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../widgets/helpers/ensure-visible.dart';
+
 class ProductEditPage extends StatefulWidget {
   final Map<String, dynamic> product;
   final int productIndex;
@@ -28,6 +30,11 @@ class ProductEditPage extends StatefulWidget {
 
 class _ProductEditPageState extends State<ProductEditPage> {
   final bool doValidation = true;
+
+  final _titleFocusNode = FocusNode();
+  final _detailsFocusNode = FocusNode();
+  final _addressFocusNode = FocusNode();
+  final _priceFocusNode = FocusNode();
 
   Map<String, dynamic> _formData = {
     'title': '',
@@ -95,54 +102,69 @@ class _ProductEditPageState extends State<ProductEditPage> {
   }
 
   Widget _buildTitleTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Title'),
-      initialValue: _formData['title'],
-      onSaved: (String value) => _formData['title'] = value,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 5)
-          return 'Title is required and should be 5+ characters long';
-      },
+    return EnsureVisibleWhenFocused(
+      focusNode: _titleFocusNode,
+      child: TextFormField(
+        decoration: InputDecoration(labelText: 'Product Title'),
+        focusNode: _titleFocusNode,
+        initialValue: _formData['title'],
+        onSaved: (String value) => _formData['title'] = value,
+        validator: (String value) {
+          if (value.isEmpty || value.length < 5)
+            return 'Title is required and should be 5+ characters long';
+        },
+      ),
     );
   }
 
   Widget _buildPriceTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Price'),
-      initialValue: _formData['price'].toString(),
-      keyboardType: TextInputType.number,
-      onSaved: (String value) => _formData['price'] = double.parse(value),
-      validator: (String value) {
-        if (value.isEmpty ||
-            !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value))
-          return 'Price is required and should be a number';
-      },
+    return EnsureVisibleWhenFocused(
+      focusNode: _priceFocusNode,
+      child: TextFormField(
+        decoration: InputDecoration(labelText: 'Product Price'),
+        initialValue: _formData['price'].toString(),
+        focusNode: _priceFocusNode,
+        keyboardType: TextInputType.number,
+        onSaved: (String value) => _formData['price'] = double.parse(value),
+        validator: (String value) {
+          if (value.isEmpty ||
+              !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value))
+            return 'Price is required and should be a number';
+        },
+      ),
     );
   }
 
   Widget _buildAddressTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Address'),
-      initialValue: _formData['address'],
-      maxLines: 4,
-      onSaved: (String value) => _formData['address'] = value,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 5)
-          return 'Address is required and should be 5+ characters long';
-      },
+    return EnsureVisibleWhenFocused(
+      focusNode: _addressFocusNode,
+      child: TextFormField(
+        decoration: InputDecoration(labelText: 'Product Address'),
+        initialValue: _formData['address'],
+        focusNode: _addressFocusNode,
+        onSaved: (String value) => _formData['address'] = value,
+        validator: (String value) {
+          if (value.isEmpty || value.length < 5)
+            return 'Address is required and should be 5+ characters long';
+        },
+      ),
     );
   }
 
   Widget _buildDescriptionTextField() {
-    return TextFormField(
-      decoration: InputDecoration(labelText: 'Product Details'),
-      initialValue: _formData['details'],
-      maxLines: 4,
-      onSaved: (String value) => _formData['details'] = value,
-      validator: (String value) {
-        if (value.isEmpty || value.length < 5)
-          return 'Details are required and should be 5+ characters long';
-      },
+    return EnsureVisibleWhenFocused(
+      focusNode: _detailsFocusNode,
+      child: TextFormField(
+        decoration: InputDecoration(labelText: 'Product Details'),
+        focusNode: _detailsFocusNode,
+        initialValue: _formData['details'],
+        maxLines: 4,
+        onSaved: (String value) => _formData['details'] = value,
+        validator: (String value) {
+          if (value.isEmpty || value.length < 5)
+            return 'Details are required and should be 5+ characters long';
+        },
+      ),
     );
   }
 
