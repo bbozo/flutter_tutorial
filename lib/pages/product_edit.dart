@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 
-class ProductCreatePage extends StatefulWidget {
+class ProductEditPage extends StatefulWidget {
+  final Map<String, dynamic> product;
   final Function addProduct;
+  final Function updateProduct;
 
-  ProductCreatePage(this.addProduct);
+  ProductEditPage({this.addProduct, this.updateProduct, this.product});
 
   @override
-  _ProductCreatePageState createState() {
-    return new _ProductCreatePageState();
+  _ProductEditPageState createState() {
+    return new _ProductEditPageState();
   }
 }
 
-class _ProductCreatePageState extends State<ProductCreatePage> {
+class _ProductEditPageState extends State<ProductEditPage> {
   final bool doValidation = true;
 
   final Map<String, dynamic> _formData = {

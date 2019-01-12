@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/pages/product_edit.dart';
 
 class ProductListPage extends StatelessWidget {
   final List<Map<String, dynamic>> products;
@@ -13,7 +14,15 @@ class ProductListPage extends StatelessWidget {
         return ListTile(
           // leading: Image.asset(product['image']),
           title: Text(product['title']),
-          trailing: IconButton(icon: Icon(Icons.edit), onPressed: (){},),
+          trailing: IconButton(
+            icon: Icon(Icons.edit),
+            onPressed: () {
+              Navigator.of(context)
+                  .push(MaterialPageRoute(builder: (context) {
+                    return ProductEditPage(product: product);
+                  }));
+            },
+          ),
         );
       },
       itemCount: products.length,
