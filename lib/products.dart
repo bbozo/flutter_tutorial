@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 
 class Products extends StatelessWidget {
   final List<Map<String, dynamic>> products;
@@ -34,10 +35,7 @@ class Products extends StatelessWidget {
                     borderRadius: BorderRadius.circular(5.0),
                   ),
                   padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
-                  child: Text(
-                    '\$${product['price'].toString()}',
-                    style: TextStyle(color: Colors.white),
-                  ),
+                  child: PriceTag(product['price']),
                 )
               ],
             ),
@@ -88,3 +86,4 @@ class Products extends StatelessWidget {
     return _buildProductList();
   }
 }
+

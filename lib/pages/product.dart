@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter_tutorial/widgets/product/price_tag.dart';
+
 class ProductPage extends StatelessWidget {
   final Map<String, dynamic> product;
 
@@ -71,14 +73,7 @@ class ProductPage extends StatelessWidget {
                     left: 0.0,
                     bottom: 0.0,
                     child: Padding(
-                      child: Text(
-                        "\$" + product['price'].toString(),
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.white,
-                            background: Paint(),
-                            fontFamily: 'Oswald'),
-                      ),
+                      child: PriceTag(product['price']),
                       padding: EdgeInsets.all(10.00),
                     ),
                   ),
