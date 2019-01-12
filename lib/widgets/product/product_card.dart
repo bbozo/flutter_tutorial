@@ -15,34 +15,42 @@ class ProductCard extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Image.asset(product['image']),
-          Container(
-            padding: EdgeInsets.only(top: 10.00),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                DefaultTitle(product['title']),
-                SizedBox(width: 8.0),
-                PriceTag(product['price']),
-              ],
-            ),
-          ),
+          _buildProductTitleAndPriceContainer(),
           AddressTag(product['address']),
-          ButtonBar(
-            alignment: MainAxisAlignment.center,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(Icons.info),
-                color: Theme.of(context).accentColor,
-                onPressed: () => Navigator.pushNamed<bool>(
-                    context, '/product/' + productIndex.toString()),
-              ),
-              IconButton(
-                icon: Icon(Icons.favorite_border),
-                color: Colors.red,
-                onPressed: () {},
-              ),
-            ],
-          )
+          _buildButtonBar(context)
+        ],
+      ),
+    );
+  }
+
+  ButtonBar _buildButtonBar(BuildContext context) {
+    return ButtonBar(
+      alignment: MainAxisAlignment.center,
+      children: <Widget>[
+        IconButton(
+          icon: Icon(Icons.info),
+          color: Theme.of(context).accentColor,
+          onPressed: () => Navigator.pushNamed<bool>(
+              context, '/product/' + productIndex.toString()),
+        ),
+        IconButton(
+          icon: Icon(Icons.favorite_border),
+          color: Colors.red,
+          onPressed: () {},
+        ),
+      ],
+    );
+  }
+
+  Container _buildProductTitleAndPriceContainer() {
+    return Container(
+      padding: EdgeInsets.only(top: 10.00),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          DefaultTitle(product['title']),
+          SizedBox(width: 8.0),
+          PriceTag(product['price']),
         ],
       ),
     );

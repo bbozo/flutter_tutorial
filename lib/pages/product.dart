@@ -10,6 +10,88 @@ class ProductPage extends StatelessWidget {
 
   ProductPage(this.product);
 
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: backButtonSubmit(context),
+      child: Scaffold(
+        appBar: AppBar(title: Text('Product Detail')),
+        body: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: <Widget>[
+            DefaultTitle(product['title']),
+            _buildProductImageWithOverlay(context),
+            AddressTag(product['address']),
+            buildDetailsContainer(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Container _buildProductImageWithOverlay(BuildContext context) {
+    return Container(
+      constraints: BoxConstraints.expand(height: 250.0),
+      margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+      decoration: BoxDecoration(
+          image: DecorationImage(
+              image: AssetImage(product['image']), fit: BoxFit.cover)),
+      child: _buildOverlayForProductImage(context),
+    );
+  }
+
+  Container buildDetailsContainer() {
+    return Container(
+      padding: EdgeInsets.all(10.0),
+      child: Text(
+        product['details'],
+        style: TextStyle(fontSize: 18.0),
+      ),
+    );
+  }
+
+  Stack _buildOverlayForProductImage(BuildContext context) {
+    return Stack(
+      children: <Widget>[
+        Positioned(
+            right: 0,
+            top: 0,
+            child: IconButton(
+              icon: Icon(Icons.delete_outline),
+              color: Colors.grey,
+              iconSize: 35,
+              onPressed: () => _showWarningDialogue(context),
+            )),
+        Positioned(
+          left: 0.0,
+          bottom: 0.0,
+          child: Padding(
+            child: PriceTag(product['price']),
+            padding: EdgeInsets.all(10.00),
+          ),
+        ),
+        Positioned(
+          right: 0.0,
+          bottom: 0.0,
+          child: IconButton(
+            icon: Icon(Icons.favorite_border),
+            color: Colors.red,
+            onPressed: () {},
+          ),
+        ),
+      ],
+    );
+  }
+
+  Function backButtonSubmit(BuildContext context) {
+    return () {
+      print('Back button pressed');
+      Navigator.pop(context, false);
+      return Future.value(false);
+    };
+  }
+
+
   void _showWarningDialogue(BuildContext context) {
     showDialog(
         builder: (BuildContext context) {
@@ -34,68 +116,4 @@ class ProductPage extends StatelessWidget {
         context: context);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () {
-        print('Back button pressed');
-        Navigator.pop(context, false);
-        return Future.value(false);
-      },
-      child: Scaffold(
-        appBar: AppBar(title: Text('Product Detail')),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            DefaultTitle(product['title']),
-            Container(
-              constraints: BoxConstraints.expand(height: 250.0),
-              margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
-              decoration: BoxDecoration(
-                  image: DecorationImage(
-                      image: AssetImage(product['image']), fit: BoxFit.cover)),
-              child: Stack(
-                children: <Widget>[
-                  Positioned(
-                      right: 0,
-                      top: 0,
-                      child: IconButton(
-                        icon: Icon(Icons.delete_outline),
-                        color: Colors.grey,
-                        iconSize: 35,
-                        onPressed: () => _showWarningDialogue(context),
-                      )),
-                  Positioned(
-                    left: 0.0,
-                    bottom: 0.0,
-                    child: Padding(
-                      child: PriceTag(product['price']),
-                      padding: EdgeInsets.all(10.00),
-                    ),
-                  ),
-                  Positioned(
-                    right: 0.0,
-                    bottom: 0.0,
-                    child: IconButton(
-                      icon: Icon(Icons.favorite_border),
-                      color: Colors.red,
-                      onPressed: () {},
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            AddressTag(product['address']),
-            Container(
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                product['details'],
-                style: TextStyle(fontSize: 18.0),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
 }

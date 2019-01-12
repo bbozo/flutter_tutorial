@@ -17,7 +17,6 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   String _description = '';
   String _address = '';
 
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -39,7 +38,6 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       ),
     );
   }
-
 
   Widget _buildTitleTextField() {
     return TextField(
