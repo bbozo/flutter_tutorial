@@ -28,13 +28,21 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       child: Container(
         width: targetWidth, // doesnt work with ListView !!!!
         child: ListView(
-          padding: EdgeInsets.symmetric(horizontal: targetPadding/2),
+          padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
           children: <Widget>[
             _buildTitleTextField(),
             _buildDescriptionTextField(),
             _buildAddressTextField(),
             _buildPriceTextField(),
             SizedBox(height: 10.0),
+            // GestureDetector(
+            //   onTap: _submitForm,
+            //   child: Container(
+            //     color: Colors.green,
+            //     padding: EdgeInsets.all(5),
+            //     child: Text('My Button'),
+            //   ),
+            // )
             RaisedButton(
               child: Text('Save'),
               onPressed: _submitForm,
