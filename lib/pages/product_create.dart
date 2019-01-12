@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
 
-typedef void _FormValueSetter(String value);
-
 class ProductCreatePage extends StatefulWidget {
   final Function addProduct;
 
@@ -14,10 +12,14 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String _title = '';
-  double _price = 0.0;
-  String _details = '';
-  String _address = '';
+  final bool doValidation = true;
+
+  final Map<String, dynamic> _formData = {
+    'title': '',
+    'price': 0.0,
+    'details': '',
+    'address': '',
+  };
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
@@ -63,17 +65,10 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     );
   }
 
-  FormFieldSetter<String> _setValue(_FormValueSetter setter) {
-    return ((String value) {
-      setState(() => setter(value));
-      return;
-    });
-  }
-
   Widget _buildTitleTextField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Title'),
-      onSaved: _setValue((String value) => _title = value),
+      onSaved: (String value) => _formData['title'] = value,
       validator: (String value) {
         if (value.isEmpty || value.length < 5)
           return 'Title is required and should be 5+ characters long';
@@ -85,7 +80,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Price'),
       keyboardType: TextInputType.number,
-      onSaved: _setValue((String value) => _price = double.parse(value)),
+      onSaved: (String value) => _formData['price'] = double.parse(value),
       validator: (String value) {
         if (value.isEmpty ||
             !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value))
@@ -98,7 +93,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Address'),
       maxLines: 4,
-      onSaved: _setValue((String value) => _address = value),
+      onSaved: (String value) => _formData['address'] = value,
       validator: (String value) {
         if (value.isEmpty || value.length < 5)
           return 'Address is required and should be 5+ characters long';
@@ -110,7 +105,7 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Details'),
       maxLines: 4,
-      onSaved: _setValue((String value) => _details = value),
+      onSaved: (String value) => _formData['details'] = value,
       validator: (String value) {
         if (value.isEmpty || value.length < 5)
           return 'Details are required and should be 5+ characters long';
@@ -119,17 +114,13 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
   }
 
   void _submitForm() {
-    if (!_formKey.currentState.validate()) return;
+    if (doValidation && !_formKey.currentState.validate()) return;
+    
+    // TODO: remove me
+    _formData['image'] = 'assets/food.jpeg';
 
     _formKey.currentState.save();
-    final Map<String, dynamic> product = {
-      'title': _title,
-      'details': _details,
-      'address': _address,
-      'price': _price,
-      'image': 'assets/food.jpeg'
-    };
-    widget.addProduct(product);
+    widget.addProduct(_formData);
     Navigator.pushNamed(context, '/product');
   }
 }
