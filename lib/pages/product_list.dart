@@ -33,10 +33,7 @@ class ProductListPage extends StatelessWidget {
                     CircleAvatar(backgroundImage: AssetImage(product['image'])),
                 title: Text(product['title']),
                 subtitle: Text('\$' + product['price'].toString()),
-                trailing: IconButton(
-                  icon: Icon(Icons.edit),
-                  onPressed: () => _productEditAction(context, product, index),
-                ),
+                trailing: _buildEditButton(context, product, index),
               ),
               Divider()
             ],
@@ -47,11 +44,22 @@ class ProductListPage extends StatelessWidget {
     );
   }
 
-  void _productEditAction(
+  IconButton _buildEditButton(
       BuildContext context, Map<String, dynamic> product, int index) {
-    Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-      return ProductEditPage(
-          product: product, updateProduct: updateProduct, productIndex: index);
-    }));
+    return IconButton(
+        icon: Icon(Icons.edit),
+        onPressed: () {
+          Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (BuildContext context) {
+                return ProductEditPage(
+                  product: product,
+                  updateProduct: updateProduct,
+                  productIndex: index,
+                );
+              },
+            ),
+          );
+        });
   }
 }
