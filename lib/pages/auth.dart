@@ -15,6 +15,9 @@ class AuthPageState extends State<AuthPage> {
 
   @override
   Widget build(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
+
     return Scaffold(
       appBar: AppBar(title: Text('Login')),
       body: Container(
@@ -27,23 +30,27 @@ class AuthPageState extends State<AuthPage> {
             image: AssetImage('assets/background.jpg'),
           ),
         ),
-        child: Center(
+        child: Container(
+          alignment: Alignment.center,
           child: SingleChildScrollView(
-            child: Column(
-              children: <Widget>[
-                _buildEmailTextField(),
-                SizedBox(height: 10.0),
-                _buildPasswordTextField(),
-                buildShowPasswordCheckboxListTile(),
-                buildAcceptTermsSwitchListTile(),
-                SizedBox(height: 10.00),
-                RaisedButton(
-                  child: Text("LOG IN"),
-                  color: Theme.of(context).primaryColor,
-                  textColor: Colors.white,
-                  onPressed: _submitForm,
-                ),
-              ],
+            child: Container(
+              width: targetWidth,
+              child: Column(
+                children: <Widget>[
+                  _buildEmailTextField(),
+                  SizedBox(height: 10.0),
+                  _buildPasswordTextField(),
+                  buildShowPasswordCheckboxListTile(),
+                  buildAcceptTermsSwitchListTile(),
+                  SizedBox(height: 10.00),
+                  RaisedButton(
+                    child: Text("LOG IN"),
+                    color: Theme.of(context).primaryColor,
+                    textColor: Colors.white,
+                    onPressed: _submitForm,
+                  ),
+                ],
+              ),
             ),
           ),
         ),
