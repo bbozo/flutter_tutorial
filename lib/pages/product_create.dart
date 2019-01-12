@@ -12,9 +12,10 @@ class ProductCreatePage extends StatefulWidget {
 }
 
 class _ProductCreatePageState extends State<ProductCreatePage> {
-  String _titleValue = '';
-  double _priceValue = 0.0;
-  String _descriptionValue = '';
+  String _title = '';
+  double _price = 0.0;
+  String _description = '';
+  String _address = '';
 
   @override
   Widget build(BuildContext context) {
@@ -24,17 +25,22 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
         children: <Widget>[
           TextField(
             decoration: InputDecoration(labelText: 'Product Title'),
-            onChanged: (String value) => setState(() => _titleValue = value),
+            onChanged: (String value) => setState(() => _title = value),
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Product Description'),
             maxLines: 4,
-            onChanged: (String value) => setState(() => _descriptionValue = value),
+            onChanged: (String value) => setState(() => _description = value),
+          ),
+          TextField(
+            decoration: InputDecoration(labelText: 'Product Address'),
+            maxLines: 4,
+            onChanged: (String value) => setState(() => _address = value),
           ),
           TextField(
             decoration: InputDecoration(labelText: 'Product Price'),
             keyboardType: TextInputType.number,
-            onChanged: (String value) => setState(() => _priceValue = double.parse(value))),
+            onChanged: (String value) => setState(() => _price = double.parse(value))),
           SizedBox(height: 10.0),
           RaisedButton(
             child: Text('Save'),
@@ -42,9 +48,10 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
             textColor: Colors.white,
             onPressed: () {
               final Map<String, dynamic> product = {
-                'title': _titleValue,
-                'description': _descriptionValue,
-                'price': _priceValue,
+                'title': _title,
+                'description': _description,
+                'address': _address,
+                'price': _price,
                 'image': 'assets/food.jpeg'
               };
               widget.addProduct(product);

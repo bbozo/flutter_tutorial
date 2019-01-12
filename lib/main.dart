@@ -29,7 +29,8 @@ class _MyAppState extends State<MyApp> {
       'title': 'Choccolate',
       'image': 'assets/food.jpeg',
       'price': 25.5,
-      'details': 'Choccolate description in\nmultiple lines.'
+      'details': 'Choccolate description in\nmultiple lines.',
+      'address': 'Union Square, San Francisco',
     });
     super.initState();
   }

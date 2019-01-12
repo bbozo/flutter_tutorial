@@ -6,6 +6,30 @@ class ProductPage extends StatelessWidget {
 
   ProductPage(this.product);
 
+  void _showWarningDialogue(BuildContext context) {
+    showDialog(
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Are you sure?'),
+            content: Text('This action can not be reversed.'),
+            actions: <Widget>[
+              FlatButton(
+                  child: Text('DISCARD'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                  }),
+              FlatButton(
+                  child: Text('CONTINUE'),
+                  onPressed: () {
+                    Navigator.pop(context);
+                    Navigator.pop(context, true);
+                  }),
+            ],
+          );
+        },
+        context: context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
@@ -35,16 +59,25 @@ class ProductPage extends StatelessWidget {
               child: Stack(
                 children: <Widget>[
                   Positioned(
+                      right: 0,
+                      top: 0,
+                      child: IconButton(
+                        icon: Icon(Icons.delete_outline),
+                        color: Colors.grey,
+                        iconSize: 35,
+                        onPressed: () => _showWarningDialogue(context),
+                      )),
+                  Positioned(
                     left: 0.0,
                     bottom: 0.0,
                     child: Padding(
                       child: Text(
                         "\$" + product['price'].toString(),
                         style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.white,
-                          background: Paint()
-                        ),
+                            fontSize: 20,
+                            color: Colors.white,
+                            background: Paint(),
+                            fontFamily: 'Oswald'),
                       ),
                       padding: EdgeInsets.all(10.00),
                     ),
@@ -59,6 +92,17 @@ class ProductPage extends StatelessWidget {
                     ),
                   ),
                 ],
+              ),
+            ),
+            Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: Colors.grey, width: 2.0),
+              ),
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                product['address'],
+                style: TextStyle(fontSize: 18.0),
               ),
             ),
             Container(
