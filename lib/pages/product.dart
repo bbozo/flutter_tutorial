@@ -2,34 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 class ProductPage extends StatelessWidget {
-  final String title;
-  final String imageUrl;
+  final Map<String, dynamic> product;
 
-  ProductPage(this.title, this.imageUrl);
-
-  void _showWarningDialogue(BuildContext context) {
-    showDialog(
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Are you sure?'),
-            content: Text('This action can not be reversed.'),
-            actions: <Widget>[
-              FlatButton(
-                  child: Text('DISCARD'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  }),
-              FlatButton(
-                  child: Text('CONTINUE'),
-                  onPressed: () {
-                    Navigator.pop(context);
-                    Navigator.pop(context, true);
-                  }),
-            ],
-          );
-        },
-        context: context);
-  }
+  ProductPage(this.product);
 
   @override
   Widget build(BuildContext context) {
@@ -42,18 +17,57 @@ class ProductPage extends StatelessWidget {
       child: Scaffold(
         appBar: AppBar(title: Text('Product Detail')),
         body: Column(
-          // mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/food.jpeg'),
-            Container(padding: EdgeInsets.all(10.0), child: Text('Details!')),
+            Text(
+              product['title'],
+              style: TextStyle(
+                  fontSize: 32.0,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Oswald'),
+            ),
             Container(
-                padding: EdgeInsets.all(10.0),
-                child: RaisedButton(
-                  color: Theme.of(context).accentColor,
-                  child: Text('DELETE'),
-                  onPressed: () => _showWarningDialogue(context),
-                ))
+              constraints: BoxConstraints.expand(height: 250.0),
+              margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
+              decoration: BoxDecoration(
+                  image: DecorationImage(
+                      image: AssetImage(product['image']), fit: BoxFit.cover)),
+              child: Stack(
+                children: <Widget>[
+                  Positioned(
+                    left: 0.0,
+                    bottom: 0.0,
+                    child: Padding(
+                      child: Text(
+                        "\$" + product['price'].toString(),
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.white,
+                          background: Paint()
+                        ),
+                      ),
+                      padding: EdgeInsets.all(10.00),
+                    ),
+                  ),
+                  Positioned(
+                    right: 0.0,
+                    bottom: 0.0,
+                    child: IconButton(
+                      icon: Icon(Icons.favorite_border),
+                      color: Colors.red,
+                      onPressed: () {},
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Container(
+              padding: EdgeInsets.all(10.0),
+              child: Text(
+                product['details'],
+                style: TextStyle(fontSize: 18.0),
+              ),
+            ),
           ],
         ),
       ),

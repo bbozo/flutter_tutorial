@@ -23,6 +23,17 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   List<Map<String, dynamic>> _products = [];
 
+  @override
+  void initState() {
+    _products.add({
+      'title': 'Choccolate',
+      'image': 'assets/food.jpeg',
+      'price': 25.5,
+      'details': 'Choccolate description in\nmultiple lines.'
+    });
+    super.initState();
+  }
+
   void _addProduct(Map<String, dynamic> product) {
     setState(() {
       _products.add(product);
@@ -45,10 +56,10 @@ class _MyAppState extends State<MyApp> {
           accentColor: Colors.deepPurple,
           brightness: Brightness.light),
       routes: {
-        '/': (BuildContext context) =>
-            AuthPage(),
+        '/': (BuildContext context) => AuthPage(),
         '/product': (BuildContext context) => ProductsPage(_products),
-        '/admin': (BuildContext context) => ProductAdminPage(_addProduct, _deleteProduct),
+        '/admin': (BuildContext context) =>
+            ProductAdminPage(_addProduct, _deleteProduct),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
@@ -60,8 +71,7 @@ class _MyAppState extends State<MyApp> {
           Map<String, dynamic> product = _products[index];
 
           return MaterialPageRoute<bool>(
-            builder: (BuildContext context) =>
-                ProductPage(product['title'], product['image']),
+            builder: (BuildContext context) => ProductPage(product),
           );
         }
 
@@ -70,9 +80,8 @@ class _MyAppState extends State<MyApp> {
       onUnknownRoute: (RouteSettings settings) {
         print("UNKNOWN ROUTE! " + settings.name);
         return MaterialPageRoute(
-              builder: (BuildContext context) =>
-                  ProductsPage(_products),
-            );
+          builder: (BuildContext context) => ProductsPage(_products),
+        );
       },
     );
   }
