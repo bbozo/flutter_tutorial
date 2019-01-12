@@ -2,10 +2,23 @@ import 'package:flutter/material.dart';
 
 class ProductEditPage extends StatefulWidget {
   final Map<String, dynamic> product;
+  final int productIndex;
   final Function addProduct;
   final Function updateProduct;
 
-  ProductEditPage({this.addProduct, this.updateProduct, this.product});
+  ProductEditPage(
+      {this.addProduct, this.updateProduct, this.productIndex, this.product}) {
+    if (isNew())
+      assert(this.addProduct != null);
+    else {
+      assert(this.updateProduct != null);
+      assert(this.productIndex != null);
+    }
+  }
+
+  bool isNew() {
+    return product == null;
+  }
 
   @override
   _ProductEditPageState createState() {
@@ -16,14 +29,22 @@ class ProductEditPage extends StatefulWidget {
 class _ProductEditPageState extends State<ProductEditPage> {
   final bool doValidation = true;
 
-  final Map<String, dynamic> _formData = {
+  Map<String, dynamic> _formData = {
     'title': '',
-    'price': 0.0,
+    'price': '',
     'details': '',
     'address': '',
   };
 
+  @override
+  void initState() {
+    if (!isNew()) _formData = widget.product;
+    super.initState();
+  }
+
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool isNew() => widget.isNew();
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +52,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
     final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
     final double targetPadding = deviceWidth - targetWidth;
 
-    return Container(
+    Widget pageContent = Container(
       margin: EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
@@ -65,11 +86,18 @@ class _ProductEditPageState extends State<ProductEditPage> {
         ),
       ),
     );
+
+    if (!isNew()) {
+      return Scaffold(
+          appBar: AppBar(title: Text('Edit Product')), body: pageContent);
+    } else
+      return pageContent;
   }
 
   Widget _buildTitleTextField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Title'),
+      initialValue: _formData['title'],
       onSaved: (String value) => _formData['title'] = value,
       validator: (String value) {
         if (value.isEmpty || value.length < 5)
@@ -81,6 +109,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget _buildPriceTextField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Price'),
+      initialValue: _formData['price'].toString(),
       keyboardType: TextInputType.number,
       onSaved: (String value) => _formData['price'] = double.parse(value),
       validator: (String value) {
@@ -94,6 +123,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget _buildAddressTextField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Address'),
+      initialValue: _formData['address'],
       maxLines: 4,
       onSaved: (String value) => _formData['address'] = value,
       validator: (String value) {
@@ -106,6 +136,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
   Widget _buildDescriptionTextField() {
     return TextFormField(
       decoration: InputDecoration(labelText: 'Product Details'),
+      initialValue: _formData['details'],
       maxLines: 4,
       onSaved: (String value) => _formData['details'] = value,
       validator: (String value) {
@@ -117,12 +148,17 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   void _submitForm() {
     if (doValidation && !_formKey.currentState.validate()) return;
-    
+
     // TODO: remove me
     _formData['image'] = 'assets/food.jpeg';
 
     _formKey.currentState.save();
-    widget.addProduct(_formData);
+
+    if (isNew())
+      widget.addProduct(_formData);
+    else
+      widget.updateProduct(widget.productIndex, _formData);
+
     Navigator.pushNamed(context, '/product');
   }
 }
