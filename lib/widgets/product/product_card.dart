@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
+import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
 
 class ProductCard extends StatelessWidget {
   final Map<String, dynamic> product;
@@ -18,24 +20,13 @@ class ProductCard extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                Text(
-                  product['title'],
-                  style: TextStyle(
-                      fontSize: 26.0,
-                      fontWeight: FontWeight.bold,
-                      fontFamily: 'Oswald'),
-                ),
+                DefaultTitle(product['title']),
                 SizedBox(width: 8.0),
                 PriceTag(product['price']),
               ],
             ),
           ),
-          Container(
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey, width: 1.0),
-                  borderRadius: BorderRadius.circular(5.0)),
-              padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
-              child: Text(product['address'])),
+          AddressTag(product['address']),
           ButtonBar(
             alignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -57,4 +48,3 @@ class ProductCard extends StatelessWidget {
     );
   }
 }
-

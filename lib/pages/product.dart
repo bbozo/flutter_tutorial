@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'dart:async';
 
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
+import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
 
 class ProductPage extends StatelessWidget {
   final Map<String, dynamic> product;
@@ -45,13 +47,7 @@ class ProductPage extends StatelessWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            Text(
-              product['title'],
-              style: TextStyle(
-                  fontSize: 32.0,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Oswald'),
-            ),
+            DefaultTitle(product['title']),
             Container(
               constraints: BoxConstraints.expand(height: 250.0),
               margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
@@ -89,17 +85,7 @@ class ProductPage extends StatelessWidget {
                 ],
               ),
             ),
-            Container(
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(10),
-                border: Border.all(color: Colors.grey, width: 2.0),
-              ),
-              padding: EdgeInsets.all(10.0),
-              child: Text(
-                product['address'],
-                style: TextStyle(fontSize: 18.0),
-              ),
-            ),
+            AddressTag(product['address']),
             Container(
               padding: EdgeInsets.all(10.0),
               child: Text(
