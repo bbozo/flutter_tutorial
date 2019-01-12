@@ -4,8 +4,9 @@ import 'package:flutter_tutorial/pages/product_edit.dart';
 class ProductListPage extends StatelessWidget {
   final List<Map<String, dynamic>> products;
   final Function updateProduct;
+  final Function deleteProduct;
 
-  ProductListPage(this.products, this.updateProduct);
+  ProductListPage(this.products, this.updateProduct, this.deleteProduct);
 
   @override
   Widget build(BuildContext context) {
@@ -14,10 +15,17 @@ class ProductListPage extends StatelessWidget {
         final Map<String, dynamic> product = products[index];
 
         return Dismissible(
-          key: Key(index.toString()),
-          background: Container(
-            color: Colors.red
-          ),
+          key: Key(product['title']),
+          background: Container(color: Colors.red),
+          onDismissed: (DismissDirection direction) {
+            if (direction == DismissDirection.endToStart) {
+              print('swiped end->start');
+              deleteProduct(index);
+            } else if (direction == DismissDirection.startToEnd)
+              print('swiped start->end');
+            else
+              print('swiped something else');
+          },
           child: Column(
             children: <Widget>[
               ListTile(
@@ -39,7 +47,8 @@ class ProductListPage extends StatelessWidget {
     );
   }
 
-  void _productEditAction(BuildContext context, Map<String, dynamic> product, int index) {
+  void _productEditAction(
+      BuildContext context, Map<String, dynamic> product, int index) {
     Navigator.of(context).push(MaterialPageRoute(builder: (context) {
       return ProductEditPage(
           product: product, updateProduct: updateProduct, productIndex: index);
