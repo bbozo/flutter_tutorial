@@ -29,31 +29,34 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
 
     return Container(
       margin: EdgeInsets.all(10.0),
-      child: Container(
-        width: targetWidth, // doesnt work with ListView !!!!
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
-            children: <Widget>[
-              _buildTitleTextField(),
-              _buildDescriptionTextField(),
-              _buildAddressTextField(),
-              _buildPriceTextField(),
-              SizedBox(height: 10.0),
-              // GestureDetector(
-              //   onTap: _submitForm,
-              //   child: Container(
-              //     color: Colors.green,
-              //     padding: EdgeInsets.all(5),
-              //     child: Text('My Button'),
-              //   ),
-              // )
-              RaisedButton(
-                child: Text('Save'),
-                onPressed: _submitForm,
-              )
-            ],
+      child: GestureDetector(
+        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        child: Container(
+          width: targetWidth, // doesnt work with ListView !!!!
+          child: Form(
+            key: _formKey,
+            child: ListView(
+              padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+              children: <Widget>[
+                _buildTitleTextField(),
+                _buildDescriptionTextField(),
+                _buildAddressTextField(),
+                _buildPriceTextField(),
+                SizedBox(height: 10.0),
+                // GestureDetector(
+                //   onTap: _submitForm,
+                //   child: Container(
+                //     color: Colors.green,
+                //     padding: EdgeInsets.all(5),
+                //     child: Text('My Button'),
+                //   ),
+                // )
+                RaisedButton(
+                  child: Text('Save'),
+                  onPressed: _submitForm,
+                )
+              ],
+            ),
           ),
         ),
       ),
@@ -72,7 +75,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       decoration: InputDecoration(labelText: 'Product Title'),
       onSaved: _setValue((String value) => _title = value),
       validator: (String value) {
-        if (value.isEmpty || value.length < 5) return 'Title is required and should be 5+ characters long';
+        if (value.isEmpty || value.length < 5)
+          return 'Title is required and should be 5+ characters long';
       },
     );
   }
@@ -83,7 +87,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       keyboardType: TextInputType.number,
       onSaved: _setValue((String value) => _price = double.parse(value)),
       validator: (String value) {
-        if (value.isEmpty || !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value)) 
+        if (value.isEmpty ||
+            !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value))
           return 'Price is required and should be a number';
       },
     );
@@ -95,7 +100,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       maxLines: 4,
       onSaved: _setValue((String value) => _address = value),
       validator: (String value) {
-        if (value.isEmpty || value.length < 5) return 'Address is required and should be 5+ characters long';
+        if (value.isEmpty || value.length < 5)
+          return 'Address is required and should be 5+ characters long';
       },
     );
   }
@@ -106,7 +112,8 @@ class _ProductCreatePageState extends State<ProductCreatePage> {
       maxLines: 4,
       onSaved: _setValue((String value) => _details = value),
       validator: (String value) {
-        if (value.isEmpty || value.length < 5) return 'Details are required and should be 5+ characters long';
+        if (value.isEmpty || value.length < 5)
+          return 'Details are required and should be 5+ characters long';
       },
     );
   }
