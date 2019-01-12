@@ -3,10 +3,11 @@ import './product_list.dart';
 import './product_create.dart';
 
 class ProductAdminPage extends StatelessWidget {
+  final List<Map<String, dynamic>> products;
   final Function addProduct;
   final Function deleteProduct;
 
-  ProductAdminPage(this.addProduct, this.deleteProduct);
+  ProductAdminPage(this.products, this.addProduct, this.deleteProduct);
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,7 @@ class ProductAdminPage extends StatelessWidget {
           body: TabBarView(
             children: <Widget>[
               ProductCreatePage(addProduct),
-              ProductListPage()
+              ProductListPage(products)
             ],
           ),
         ));
