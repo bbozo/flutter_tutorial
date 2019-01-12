@@ -8,10 +8,17 @@ class AuthPage extends StatefulWidget {
 }
 
 class AuthPageState extends State<AuthPage> {
-  String _emailValue = '';
-  String _passwordValue = '';
-  bool _showPasswordValue = false;
-  bool _acceptTerms = false;
+  Map<String, dynamic> _formData = {
+    'email': null,
+    'password': null,
+    'showPassword': false,
+    'acceptTerms': false,
+  };
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final RegExp emailRegexp = RegExp(
+      r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
 
   @override
   Widget build(BuildContext context) {
@@ -30,24 +37,30 @@ class AuthPageState extends State<AuthPage> {
             image: AssetImage('assets/background.jpg'),
           ),
         ),
-        child: Container(
-          alignment: Alignment.center,
-          child: SingleChildScrollView(
-            child: Container(
-              width: targetWidth,
-              child: Column(
-                children: <Widget>[
-                  _buildEmailTextField(),
-                  SizedBox(height: 10.0),
-                  _buildPasswordTextField(),
-                  buildShowPasswordCheckboxListTile(),
-                  buildAcceptTermsSwitchListTile(),
-                  SizedBox(height: 10.00),
-                  RaisedButton(
-                    child: Text("LOG IN"),
-                    onPressed: _submitForm,
+        child: GestureDetector(
+          onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+          child: Container(
+            alignment: Alignment.center,
+            child: SingleChildScrollView(
+              child: Container(
+                width: targetWidth,
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: <Widget>[
+                      _buildEmailTextField(),
+                      SizedBox(height: 10.0),
+                      _buildPasswordTextField(),
+                      _buildShowPasswordCheckboxListTile(),
+                      _buildAcceptTermsSwitchListTile(),
+                      SizedBox(height: 10.00),
+                      RaisedButton(
+                        child: Text("LOG IN"),
+                        onPressed: _submitForm,
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -56,40 +69,55 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  SwitchListTile buildAcceptTermsSwitchListTile() {
+  SwitchListTile _buildAcceptTermsSwitchListTile() {
     return SwitchListTile(
-        title: Text('Accept terms'),
-        value: _acceptTerms,
-        onChanged: (bool value) => setState(() => _acceptTerms = value));
-  }
-
-  CheckboxListTile buildShowPasswordCheckboxListTile() {
-    return CheckboxListTile(
-      title: Text('Show password'),
-      value: _showPasswordValue,
-      onChanged: (bool value) => setState(() => _showPasswordValue = value),
+      title: Text('Accept terms'),
+      value: _formData['acceptTerms'],
+      onChanged: (bool value) =>
+          setState(() => _formData['acceptTerms'] = value),    
     );
   }
 
-  TextField _buildPasswordTextField() {
-    return TextField(
-        decoration: InputDecoration(
-            labelText: 'Password', filled: true, fillColor: Colors.white),
-        obscureText: !_showPasswordValue,
-        onChanged: (String value) => setState(() => _passwordValue = value));
+  CheckboxListTile _buildShowPasswordCheckboxListTile() {
+    return CheckboxListTile(
+      title: Text('Show password'),
+      value: _formData['showPassword'],
+      onChanged: (bool value) =>
+          setState(() => _formData['showPassword'] = value),
+    );
   }
 
-  TextField _buildEmailTextField() {
-    return TextField(
+  TextFormField _buildPasswordTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: 'Password', filled: true, fillColor: Colors.white),
+      obscureText: !_formData['showPassword'],
+      onSaved: (String value) => _formData['password'] = value,
+      validator: (String value) {
+        if (value != 'x') return 'Password or e-mail are not valid';
+      },
+    );
+  }
+
+  TextFormField _buildEmailTextField() {
+    return TextFormField(
       decoration: InputDecoration(
           labelText: 'E-mail', filled: true, fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
-      onChanged: (String value) => setState(() => _emailValue = value),
+      onSaved: (String value) => _formData['email'] = value,
+      validator: (String value) {
+        if (value.isEmpty || !emailRegexp.hasMatch(value))
+          return 'Password or e-mail are not valid';
+      },
     );
   }
 
   void _submitForm() {
-    print('email ' + _emailValue + '   password ' + _passwordValue);
+    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
+
+    _formKey.currentState.save();
+    print('AUTH FORM: ' + _formData.toString());
+
     Navigator.pushReplacementNamed(context, '/product');
   }
 }
