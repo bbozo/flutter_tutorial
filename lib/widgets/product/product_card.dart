@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 
-class Products extends StatelessWidget {
-  final List<Map<String, dynamic>> products;
+class ProductCard extends StatelessWidget {
+  final Map<String, dynamic> product;
+  final productIndex;
 
-  Products(this.products) {
-    print("[Products Widget] constructor");
-  }
+  ProductCard(this.productIndex, this.product);
 
-  // Widget _buildProductItem({String text, String imagePath}) {
-  Widget _buildProductItem(BuildContext context, int index) {
-    Map<String, dynamic> product = products[index];
-
+  @override
+  Widget build(BuildContext context) {
     return Card(
       child: Column(
         children: <Widget>[
@@ -29,14 +26,7 @@ class Products extends StatelessWidget {
                       fontFamily: 'Oswald'),
                 ),
                 SizedBox(width: 8.0),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Theme.of(context).accentColor,
-                    borderRadius: BorderRadius.circular(5.0),
-                  ),
-                  padding: EdgeInsets.symmetric(horizontal: 6.0, vertical: 2.5),
-                  child: PriceTag(product['price']),
-                )
+                PriceTag(product['price']),
               ],
             ),
           ),
@@ -53,7 +43,7 @@ class Products extends StatelessWidget {
                 icon: Icon(Icons.info),
                 color: Theme.of(context).accentColor,
                 onPressed: () => Navigator.pushNamed<bool>(
-                    context, '/product/' + index.toString()),
+                    context, '/product/' + productIndex.toString()),
               ),
               IconButton(
                 icon: Icon(Icons.favorite_border),
@@ -65,25 +55,6 @@ class Products extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  Widget _buildProductList() {
-    Widget productCard =
-        Center(child: Text("No products found, please add some"));
-
-    if (products.length > 0)
-      productCard = ListView.builder(
-        itemBuilder: _buildProductItem,
-        itemCount: products.length,
-      );
-
-    return productCard;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    print("[Products Widget] build()");
-    return _buildProductList();
   }
 }
 
