@@ -55,43 +55,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   @override
   Widget build(BuildContext context) {
-    final double deviceWidth = MediaQuery.of(context).size.width;
-    final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
-    final double targetPadding = deviceWidth - targetWidth;
-
     Widget pageContent = Container(
       margin: EdgeInsets.all(10.0),
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
-        child: Container(
-          width: targetWidth, // doesnt work with ListView !!!!
-          child: Form(
-            key: _formKey,
-            child: ListView(
-              padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
-              children: <Widget>[
-                _buildTitleTextField(),
-                _buildDescriptionTextField(),
-                _buildAddressTextField(),
-                _buildPriceTextField(),
-                SizedBox(height: 10.0),
-                // GestureDetector(
-                //   onTap: _submitForm,
-                //   child: Container(
-                //     color: Colors.green,
-                //     padding: EdgeInsets.all(5),
-                //     child: Text('My Button'),
-                //   ),
-                // )
-                RaisedButton(
-                  child: Text('Save'),
-                  onPressed: _submitForm,
-                )
-              ],
-            ),
-          ),
-        ),
-      ),
+      child: _buildPageContent(context),
     );
 
     if (!isNew()) {
@@ -99,6 +65,44 @@ class _ProductEditPageState extends State<ProductEditPage> {
           appBar: AppBar(title: Text('Edit Product')), body: pageContent);
     } else
       return pageContent;
+  }
+
+  Widget _buildPageContent(BuildContext context) {
+    final double deviceWidth = MediaQuery.of(context).size.width;
+    final double targetWidth = deviceWidth > 550.0 ? 500.0 : deviceWidth * 0.95;
+    final double targetPadding = deviceWidth - targetWidth;
+
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+      child: Container(
+        width: targetWidth, // doesnt work with ListView !!!!
+        child: Form(
+          key: _formKey,
+          child: ListView(
+            padding: EdgeInsets.symmetric(horizontal: targetPadding / 2),
+            children: <Widget>[
+              _buildTitleTextField(),
+              _buildDescriptionTextField(),
+              _buildAddressTextField(),
+              _buildPriceTextField(),
+              SizedBox(height: 10.0),
+              // GestureDetector(
+              //   onTap: _submitForm,
+              //   child: Container(
+              //     color: Colors.green,
+              //     padding: EdgeInsets.all(5),
+              //     child: Text('My Button'),
+              //   ),
+              // )
+              RaisedButton(
+                child: Text('Save'),
+                onPressed: _submitForm,
+              )
+            ],
+          ),
+        ),
+      ),
+    );
   }
 
   Widget _buildTitleTextField() {
