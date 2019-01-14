@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductsModel extends Model {
+  static ProductsModel of(BuildContext context) =>
+      ScopedModel.of<ProductsModel>(context);
+
   List<Product> _products = [];
   bool _showFavorites = false;
 

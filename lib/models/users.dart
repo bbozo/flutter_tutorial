@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class UsersModel extends Model {
+  static UsersModel of(BuildContext context) =>
+      ScopedModel.of<UsersModel>(context);
+
   User _currentUser;
 
   void login(String email, String password) {

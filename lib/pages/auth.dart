@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/models/users.dart';
 
 class AuthPage extends StatefulWidget {
   @override
@@ -56,7 +57,7 @@ class AuthPageState extends State<AuthPage> {
                       SizedBox(height: 10.00),
                       RaisedButton(
                         child: Text("LOG IN"),
-                        onPressed: _submitForm,
+                        onPressed: () => _submitForm(UsersModel.of(context).login),
                       ),
                     ],
                   ),
@@ -112,10 +113,11 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm() {
+  void _submitForm(Function login) {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
 
     _formKey.currentState.save();
+    login(_formData['email'], _formData['password']);
     print('AUTH FORM: ' + _formData.toString());
 
     Navigator.pushReplacementNamed(context, '/product');
