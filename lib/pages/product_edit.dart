@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/models/product.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
 
 class ProductEditPage extends StatefulWidget {
-  final Map<String, dynamic> product;
+  final Product product;
   final int productIndex;
   final Function addProduct;
   final Function updateProduct;
@@ -45,7 +46,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   @override
   void initState() {
-    if (!isNew()) _formData = widget.product;
+    if (!isNew()) _formData = widget.product.toMap();
     super.initState();
   }
 
@@ -175,15 +176,20 @@ class _ProductEditPageState extends State<ProductEditPage> {
   void _submitForm() {
     if (doValidation && !_formKey.currentState.validate()) return;
 
-    // TODO: remove me
-    _formData['image'] = 'assets/food.jpeg';
+    final Product product = Product(
+      title: _formData['title'],
+      details: _formData['details'],
+      address: _formData['address'],
+      image: 'assets/food.jpeg',
+      price: _formData['price'],
+    );
 
     _formKey.currentState.save();
 
     if (isNew())
-      widget.addProduct(_formData);
+      widget.addProduct(product);
     else
-      widget.updateProduct(widget.productIndex, _formData);
+      widget.updateProduct(widget.productIndex, product);
 
     Navigator.pushNamed(context, '/product');
   }

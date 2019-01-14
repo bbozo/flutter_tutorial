@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/models/product.dart';
 import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'dart:async';
 
@@ -6,7 +7,7 @@ import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
 
 class ProductPage extends StatelessWidget {
-  final Map<String, dynamic> product;
+  final Product product;
 
   ProductPage(this.product);
 
@@ -19,9 +20,9 @@ class ProductPage extends StatelessWidget {
         body: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            DefaultTitle(product['title']),
+            DefaultTitle(product.title),
             _buildProductImageWithOverlay(context),
-            AddressTag(product['address']),
+            AddressTag(product.address),
             buildDetailsContainer(),
           ],
         ),
@@ -35,7 +36,7 @@ class ProductPage extends StatelessWidget {
       margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
       decoration: BoxDecoration(
           image: DecorationImage(
-              image: AssetImage(product['image']), fit: BoxFit.cover)),
+              image: AssetImage(product.image), fit: BoxFit.cover)),
       child: _buildOverlayForProductImage(context),
     );
   }
@@ -44,7 +45,7 @@ class ProductPage extends StatelessWidget {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Text(
-        product['details'],
+        product.details,
         style: TextStyle(fontSize: 18.0),
       ),
     );
@@ -66,7 +67,7 @@ class ProductPage extends StatelessWidget {
           left: 0.0,
           bottom: 0.0,
           child: Padding(
-            child: PriceTag(product['price']),
+            child: PriceTag(product.price),
             padding: EdgeInsets.all(10.00),
           ),
         ),

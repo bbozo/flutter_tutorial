@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/pages/product.dart';
 import 'package:flutter_tutorial/pages/product_admin.dart';
 import 'package:flutter_tutorial/pages/products.dart';
+import 'models/product.dart';
 // import 'package:flutter/rendering.dart';
 
 import './pages/auth.dart';
@@ -21,28 +22,28 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  List<Map<String, dynamic>> _products = [];
+  List<Product> _products = [];
 
   @override
   void initState() {
-    _products.add({
-      'title': 'Choccolate',
-      'image': 'assets/food.jpeg',
-      'price': 25.5,
-      'details': 'Choccolate description in\nmultiple lines.',
-      'address': 'Union Square, San Francisco',
-    });
-    _products.add({
-      'title': 'Cookies',
-      'image': 'assets/food.jpeg',
-      'price': 15.5,
-      'details': 'Cookies description in\nmultiple lines.\nAnd more lines.',
-      'address': 'Union Square, San Francisco',
-    });
+    _products.add(Product(
+      title: 'Choccolate',
+      image: 'assets/food.jpeg',
+      price: 25.5,
+      details: 'Choccolate description in\nmultiple lines.',
+      address: 'Union Square, San Francisco',
+    ));
+    _products.add(Product(
+      title: 'Cookies',
+      image: 'assets/food.jpeg',
+      price: 15.5,
+      details: 'Cookies description in\nmultiple lines.\nAnd more lines.',
+      address: 'Union Square, San Francisco',
+    ));
     super.initState();
   }
 
-  void _addProduct(Map<String, dynamic> product) {
+  void _addProduct(Product product) {
     setState(() {
       _products.add(product);
     });
@@ -54,7 +55,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _updateProduct(int index, Map<String, dynamic> product) {
+  void _updateProduct(int index, Product product) {
     setState(() {
       _products[index] = product;
     });
@@ -69,8 +70,8 @@ class _MyAppState extends State<MyApp> {
       routes: {
         '/': (BuildContext context) => AuthPage(),
         '/product': (BuildContext context) => ProductsPage(_products),
-        '/admin': (BuildContext context) =>
-            ProductAdminPage(_products, _addProduct, _deleteProduct, _updateProduct),
+        '/admin': (BuildContext context) => ProductAdminPage(
+            _products, _addProduct, _deleteProduct, _updateProduct),
       },
       onGenerateRoute: (RouteSettings settings) {
         final List<String> pathElements = settings.name.split('/');
@@ -79,7 +80,7 @@ class _MyAppState extends State<MyApp> {
 
         if (pathElements[1] == 'product') {
           final int index = int.parse(pathElements[2]);
-          Map<String, dynamic> product = _products[index];
+          final Product product = _products[index];
 
           return MaterialPageRoute<bool>(
             builder: (BuildContext context) => ProductPage(product),
