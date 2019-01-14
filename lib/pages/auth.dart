@@ -17,7 +17,7 @@ class AuthPageState extends State<AuthPage> {
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final RegExp emailRegexp = RegExp(
+  RegExp emailRegexp = RegExp(
       r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
 
   @override
@@ -113,7 +113,7 @@ class AuthPageState extends State<AuthPage> {
   }
 
   void _submitForm() {
-    // if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
+    if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
 
     _formKey.currentState.save();
     print('AUTH FORM: ' + _formData.toString());

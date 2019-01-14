@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tutorial/models/product.dart';
-import 'package:flutter_tutorial/scoped-models/products.dart';
+import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/widgets/product/address_tag.dart';
-import 'dart:async';
 
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
@@ -10,7 +8,6 @@ import 'package:scoped_model/scoped_model.dart';
 
 class ProductPage extends StatelessWidget {
   final int productIndex;
-  Product product;
 
   ProductPage(this.productIndex);
 
@@ -20,7 +17,7 @@ class ProductPage extends StatelessWidget {
         onWillPop: backButtonSubmit(context),
         child: ScopedModelDescendant<ProductsModel>(
           builder: (BuildContext context, Widget child, ProductsModel model) {
-            product = model.products[productIndex];
+            Product product = model.products[productIndex];
 
             return Scaffold(
               appBar: AppBar(title: Text(product.title)),
@@ -28,9 +25,9 @@ class ProductPage extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
                   DefaultTitle(product.title),
-                  _buildProductImageWithOverlay(context),
+                  _buildProductImageWithOverlay(product, context),
                   AddressTag(product.address),
-                  buildDetailsContainer(),
+                  buildDetailsContainer(product),
                 ],
               ),
             );
@@ -38,18 +35,18 @@ class ProductPage extends StatelessWidget {
         ));
   }
 
-  Container _buildProductImageWithOverlay(BuildContext context) {
+  Container _buildProductImageWithOverlay(Product product, BuildContext context) {
     return Container(
       constraints: BoxConstraints.expand(height: 250.0),
       margin: EdgeInsets.symmetric(horizontal: 15.0, vertical: 10.0),
       decoration: BoxDecoration(
           image: DecorationImage(
               image: AssetImage(product.image), fit: BoxFit.cover)),
-      child: _buildOverlayForProductImage(context),
+      child: _buildOverlayForProductImage(product, context),
     );
   }
 
-  Container buildDetailsContainer() {
+  Container buildDetailsContainer(Product product) {
     return Container(
       padding: EdgeInsets.all(10.0),
       child: Text(
@@ -59,7 +56,7 @@ class ProductPage extends StatelessWidget {
     );
   }
 
-  Stack _buildOverlayForProductImage(BuildContext context) {
+  Stack _buildOverlayForProductImage(Product product, BuildContext context) {
     return Stack(
       children: <Widget>[
         Positioned(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tutorial/scoped-models/products.dart';
+import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/widgets/product/products.dart';
 import 'package:scoped_model/scoped_model.dart';
 

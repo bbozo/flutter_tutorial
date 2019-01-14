@@ -1,41 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tutorial/models/product.dart';
-import 'package:flutter_tutorial/scoped-models/products.dart';
+import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
 import 'package:scoped_model/scoped_model.dart';
 
-class ProductCard extends StatefulWidget {
-  final productIndex;
+class ProductCard extends StatelessWidget {
+  final int productIndex;
 
   ProductCard(this.productIndex);
-
-  @override
-  ProductCardState createState() {
-    return new ProductCardState();
-  }
-}
-
-class ProductCardState extends State<ProductCard> {
-  Product product;
-
-  ProductsModel productsModel;
 
   @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {
-        productsModel = model;
-        product = model.products[widget.productIndex];
+        Product product = model.products[productIndex];
 
         return Card(
           child: Column(
             children: <Widget>[
               Image.asset(product.image),
-              _buildProductTitleAndPriceContainer(),
+              _buildProductTitleAndPriceContainer(product),
               AddressTag(product.address),
-              _buildButtonBar(context)
+              _buildButtonBar(product, model.toggleFavoriteStatus, context)
             ],
           ),
         );
@@ -43,7 +30,7 @@ class ProductCardState extends State<ProductCard> {
     );
   }
 
-  Widget _buildButtonBar(BuildContext context) {
+  Widget _buildButtonBar(Product product, Function toggleFavorite, BuildContext context) {
     return ButtonBar(
       alignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -51,21 +38,21 @@ class ProductCardState extends State<ProductCard> {
           icon: Icon(Icons.info),
           color: Theme.of(context).accentColor,
           onPressed: () => Navigator.pushNamed<bool>(
-              context, '/product/' + widget.productIndex.toString()),
+              context, '/product/' + productIndex.toString()),
         ),
         IconButton(
           icon:
               Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),
           color: Colors.red,
           onPressed: () {
-            productsModel.toggleFavoriteStatus(widget.productIndex);
+            toggleFavorite(productIndex);
           },
         ),
       ],
     );
   }
 
-  Container _buildProductTitleAndPriceContainer() {
+  Container _buildProductTitleAndPriceContainer(Product product) {
     return Container(
       padding: EdgeInsets.only(top: 10.00),
       child: Row(

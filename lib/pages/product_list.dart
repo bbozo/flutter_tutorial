@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tutorial/models/product.dart';
+import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/pages/product_edit.dart';
-import 'package:flutter_tutorial/scoped-models/products.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductListPage extends StatelessWidget {
