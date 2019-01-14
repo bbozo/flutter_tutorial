@@ -1,30 +1,49 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/product.dart';
+import 'package:flutter_tutorial/scoped-models/products.dart';
 import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
+import 'package:scoped_model/scoped_model.dart';
 
-class ProductCard extends StatelessWidget {
-  final Product product;
+class ProductCard extends StatefulWidget {
   final productIndex;
 
-  ProductCard(this.productIndex, this.product);
+  ProductCard(this.productIndex);
+
+  @override
+  ProductCardState createState() {
+    return new ProductCardState();
+  }
+}
+
+class ProductCardState extends State<ProductCard> {
+  Product product;
+
+  ProductsModel productsModel;
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Column(
-        children: <Widget>[
-          Image.asset(product.image),
-          _buildProductTitleAndPriceContainer(),
-          AddressTag(product.address),
-          _buildButtonBar(context)
-        ],
-      ),
+    return ScopedModelDescendant<ProductsModel>(
+      builder: (BuildContext context, Widget child, ProductsModel model) {
+        productsModel = model;
+        product = model.products[widget.productIndex];
+
+        return Card(
+          child: Column(
+            children: <Widget>[
+              Image.asset(product.image),
+              _buildProductTitleAndPriceContainer(),
+              AddressTag(product.address),
+              _buildButtonBar(context)
+            ],
+          ),
+        );
+      },
     );
   }
 
-  ButtonBar _buildButtonBar(BuildContext context) {
+  Widget _buildButtonBar(BuildContext context) {
     return ButtonBar(
       alignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -32,12 +51,15 @@ class ProductCard extends StatelessWidget {
           icon: Icon(Icons.info),
           color: Theme.of(context).accentColor,
           onPressed: () => Navigator.pushNamed<bool>(
-              context, '/product/' + productIndex.toString()),
+              context, '/product/' + widget.productIndex.toString()),
         ),
         IconButton(
-          icon: Icon(Icons.favorite_border),
+          icon:
+              Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),
           color: Colors.red,
-          onPressed: () {},
+          onPressed: () {
+            productsModel.toggleFavoriteStatus(widget.productIndex);
+          },
         ),
       ],
     );

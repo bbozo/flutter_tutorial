@@ -6,6 +6,7 @@ class Product {
   final double price;
   final String address;
   final String image;
+  bool isFavorite;
 
   Product({
     @required this.title,
@@ -13,6 +14,7 @@ class Product {
     @required this.price,
     @required this.address,
     @required this.image,
+    this.isFavorite = false
   });
 
   Map<String, dynamic> toMap() {
