@@ -1,27 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/product.dart';
+import 'package:flutter_tutorial/scoped-models/products.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class ProductEditPage extends StatefulWidget {
-  final Product product;
   final int productIndex;
-  final Function addProduct;
-  final Function updateProduct;
 
-  ProductEditPage(
-      {this.addProduct, this.updateProduct, this.productIndex, this.product}) {
-    if (isNew())
-      assert(this.addProduct != null);
-    else {
-      assert(this.updateProduct != null);
-      assert(this.productIndex != null);
-    }
-  }
-
-  bool isNew() {
-    return product == null;
-  }
+  ProductEditPage({this.productIndex});
 
   @override
   _ProductEditPageState createState() {
@@ -30,6 +17,8 @@ class ProductEditPage extends StatefulWidget {
 }
 
 class _ProductEditPageState extends State<ProductEditPage> {
+  Product selectedProduct;
+
   final bool doValidation = true;
 
   final _titleFocusNode = FocusNode();
@@ -44,28 +33,36 @@ class _ProductEditPageState extends State<ProductEditPage> {
     'address': '',
   };
 
-  @override
-  void initState() {
-    if (!isNew()) _formData = widget.product.toMap();
-    super.initState();
-  }
-
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  bool isNew() => widget.isNew();
+  ProductsModel productsModel;
+
+  bool _isNew() {
+    return widget.productIndex == null;
+  }
+
+  int get productIndex => widget.productIndex;
 
   @override
   Widget build(BuildContext context) {
-    Widget pageContent = Container(
-      margin: EdgeInsets.all(10.0),
-      child: _buildPageContent(context),
-    );
+    return ScopedModelDescendant<ProductsModel>(
+        builder: (BuildContext context, Widget child, ProductsModel model) {
+      productsModel = model;
 
-    if (!isNew()) {
-      return Scaffold(
-          appBar: AppBar(title: Text('Edit Product')), body: pageContent);
-    } else
-      return pageContent;
+      if(!_isNew())
+        _formData = model.products[productIndex].toMap();
+
+      Widget pageContent = Container(
+        margin: EdgeInsets.all(10.0),
+        child: _buildPageContent(context),
+      );
+
+      if (!_isNew()) {
+        return Scaffold(
+            appBar: AppBar(title: Text('Edit Product')), body: pageContent);
+      } else
+        return pageContent;
+    });
   }
 
   Widget _buildPageContent(BuildContext context) {
@@ -95,14 +92,18 @@ class _ProductEditPageState extends State<ProductEditPage> {
               //     child: Text('My Button'),
               //   ),
               // )
-              RaisedButton(
-                child: Text('Save'),
-                onPressed: _submitForm,
-              )
+              _buildSubmitButton()
             ],
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSubmitButton() {
+    return RaisedButton(
+      child: Text('Save'),
+      onPressed: _submitForm,
     );
   }
 
@@ -130,7 +131,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         initialValue: _formData['price'].toString(),
         focusNode: _priceFocusNode,
         keyboardType: TextInputType.number,
-        onSaved: (String value) => _formData['price'] = double.parse(value),
+        onSaved: (String value) => _formData['price'] = value,
         validator: (String value) {
           if (value.isEmpty ||
               !RegExp(r'^(?:[1-9]\d*|0)?(?:\.\d+)?$').hasMatch(value))
@@ -175,21 +176,20 @@ class _ProductEditPageState extends State<ProductEditPage> {
 
   void _submitForm() {
     if (doValidation && !_formKey.currentState.validate()) return;
+    _formKey.currentState.save();
 
     final Product product = Product(
       title: _formData['title'],
       details: _formData['details'],
       address: _formData['address'],
       image: 'assets/food.jpeg',
-      price: _formData['price'],
+      price: double.parse(_formData['price']),
     );
 
-    _formKey.currentState.save();
-
-    if (isNew())
-      widget.addProduct(product);
+    if (_isNew())
+      productsModel.addProduct(product);
     else
-      widget.updateProduct(widget.productIndex, product);
+      productsModel.updateProduct(productIndex, product);
 
     Navigator.pushNamed(context, '/product');
   }

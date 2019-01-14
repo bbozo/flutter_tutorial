@@ -3,10 +3,6 @@ import 'package:flutter_tutorial/models/product.dart';
 import 'package:flutter_tutorial/widgets/product/products.dart';
 
 class ProductsPage extends StatelessWidget {
-  final List<Product> products;
-
-  ProductsPage(this.products);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -38,7 +34,7 @@ class ProductsPage extends StatelessWidget {
       // a container of it's own. Container is fixed in size, Expandable is the way to go.    
       body: Column(
         children: <Widget>[
-          Expanded(child: Products(products)),
+          Expanded(child: Products()),
         ],
       ),
     );

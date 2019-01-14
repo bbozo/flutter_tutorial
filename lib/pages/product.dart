@@ -1,33 +1,41 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/product.dart';
+import 'package:flutter_tutorial/scoped-models/products.dart';
 import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'dart:async';
 
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
+import 'package:scoped_model/scoped_model.dart';
 
 class ProductPage extends StatelessWidget {
-  final Product product;
+  final int productIndex;
+  Product product;
 
-  ProductPage(this.product);
+  ProductPage(this.productIndex);
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: backButtonSubmit(context),
-      child: Scaffold(
-        appBar: AppBar(title: Text('Product Detail')),
-        body: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: <Widget>[
-            DefaultTitle(product.title),
-            _buildProductImageWithOverlay(context),
-            AddressTag(product.address),
-            buildDetailsContainer(),
-          ],
-        ),
-      ),
-    );
+        onWillPop: backButtonSubmit(context),
+        child: ScopedModelDescendant<ProductsModel>(
+          builder: (BuildContext context, Widget child, ProductsModel model) {
+            product = model.products[productIndex];
+
+            return Scaffold(
+              appBar: AppBar(title: Text(product.title)),
+              body: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: <Widget>[
+                  DefaultTitle(product.title),
+                  _buildProductImageWithOverlay(context),
+                  AddressTag(product.address),
+                  buildDetailsContainer(),
+                ],
+              ),
+            );
+          },
+        ));
   }
 
   Container _buildProductImageWithOverlay(BuildContext context) {
@@ -92,7 +100,6 @@ class ProductPage extends StatelessWidget {
     };
   }
 
-
   void _showWarningDialogue(BuildContext context) {
     showDialog(
         builder: (BuildContext context) {
@@ -116,5 +123,4 @@ class ProductPage extends StatelessWidget {
         },
         context: context);
   }
-
 }
