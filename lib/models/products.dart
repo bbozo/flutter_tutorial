@@ -19,10 +19,12 @@ class ProductsModel extends RegisteredModel {
 
   List<Product> _products = [];
   bool _showFavorites = false;
+  bool _isLoading = false;
 
   List<Product> get products => List.of(_products);
   bool get showFavorites => _showFavorites;
   User get currentUser => (modelRegistry['users'] as UsersModel).currentUser;
+  bool get isLoading => _isLoading;
 
   List<Product> get displayedProducts {
     if (_showFavorites)
@@ -37,36 +39,47 @@ class ProductsModel extends RegisteredModel {
   }
 
   void fetchProducts() {
+    _isLoading = true;
+    notifyListeners();
     http.get(PRODUCTS_URL).then((http.Response httpResponse) {
       print(httpResponse.body);
 
       Map<String, dynamic> response = json.decode(httpResponse.body);
       _products = [];
-      response.forEach((String id, dynamic mapobj) {
-        Map<String, dynamic> map = mapobj as Map<String, dynamic>;
-        final product = Product(
-          id: id,
-          address: map['address'] ?? 'N/A',
-          details: map['details'] ?? 'N/A',
-          image: map['image'] ?? 'N/A',
-          price: map['price'].toDouble() ?? null,
-          title: map['title'] ?? 'N/A',
-          isFavorite: map['is_favorite'] ?? false,
-          userEmail: map['user_email'] ?? 'N/A',
-          userId: map['user_id'] ?? 'N/A',
-        );
-        _products.add(product);
-      });
+
+      if (response != null) {
+        response.forEach((String id, dynamic mapobj) {
+          Map<String, dynamic> map = mapobj as Map<String, dynamic>;
+          final product = Product(
+            id: id,
+            address: map['address'] ?? 'N/A',
+            details: map['details'] ?? 'N/A',
+            image: map['image'] ?? 'N/A',
+            price: map['price'].toDouble() ?? null,
+            title: map['title'] ?? 'N/A',
+            isFavorite: map['is_favorite'] ?? false,
+            userEmail: map['user_email'] ?? 'N/A',
+            userId: map['user_id'] ?? 'N/A',
+          );
+          _products.add(product);
+        });
+      }
+
+      _isLoading = false;
+      notifyListeners();
     });
   }
 
-  void addProduct(Product product) {
+  Future<Null> addProduct(Product product) {
+    _isLoading = true;
+    notifyListeners();
+
     if (currentUser != null) {
       product.userId = currentUser.id;
       product.userEmail = currentUser.email;
     }
 
-    http
+    return http
         .post(
       PRODUCTS_URL,
       body: json.encode(product.toMap()),
@@ -76,6 +89,8 @@ class ProductsModel extends RegisteredModel {
         final Map<String, dynamic> resp = json.decode(httpResponse.body);
         product.id = resp['name'];
         _products.add(product);
+        
+        _isLoading = false;
         notifyListeners();
       },
     );

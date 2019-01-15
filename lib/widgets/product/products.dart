@@ -5,18 +5,24 @@ import 'package:scoped_model/scoped_model.dart';
 
 class Products extends StatelessWidget {
   
-  Widget _buildProductList(List<Product> products) {
-    Widget productCard =
-        Center(child: Text("No products found, please add some"));
+  Widget _buildProductList(BuildContext context, List<Product> products) {       
+    Widget rv;
+    ProductsModel model = ProductsModel.of(context);
 
-    if (products.length > 0)
-      productCard = ListView.builder(
+    if (model.isLoading)
+      rv = CircularProgressIndicator();
+
+    else if (products.length == 0)
+      rv = Center(child: Text("No products found, please add some"));
+      
+    else
+      rv = ListView.builder(
         itemBuilder: (BuildContext context, int index) =>
             ProductCard(index),
         itemCount: products.length,
       );
 
-    return productCard;
+    return rv;
   }
 
   @override
@@ -24,7 +30,7 @@ class Products extends StatelessWidget {
     print("[Products Widget] build()");
     return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {
-        return _buildProductList(model.displayedProducts);
+        return _buildProductList(context, model.displayedProducts);
       },
     );
   }

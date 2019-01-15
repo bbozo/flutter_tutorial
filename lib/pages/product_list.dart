@@ -8,6 +8,8 @@ class ProductListPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {
+        model.fetchProducts();
+        
         return ListView.builder(
           itemBuilder: (BuildContext context, int index) {
             final Product product = model.products[index];

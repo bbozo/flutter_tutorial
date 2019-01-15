@@ -18,11 +18,6 @@ class ProductsPageState extends State<ProductsPage> {
   }
 
   @override
-  void updateState() {
-    ProductsModel.of(context).fetchProducts();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {

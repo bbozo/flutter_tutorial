@@ -48,8 +48,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
         builder: (BuildContext context, Widget child, ProductsModel model) {
       productsModel = model;
 
-      if(!_isNew())
-        _formData = model.products[productIndex].toMap();
+      if (!_isNew()) _formData = model.products[productIndex].toMap();
 
       Widget pageContent = Container(
         margin: EdgeInsets.all(10.0),
@@ -100,10 +99,19 @@ class _ProductEditPageState extends State<ProductEditPage> {
   }
 
   Widget _buildSubmitButton() {
-    return RaisedButton(
-      child: Text('Save'),
-      onPressed: _submitForm,
-    );
+    ProductsModel model = ProductsModel.of(context);
+
+    Widget rv;
+
+    if (model.isLoading)
+      rv = Center(child: rv = CircularProgressIndicator());
+    else
+      rv = RaisedButton(
+        child: Text('Save'),
+        onPressed: _submitForm,
+      );
+
+    return rv;
   }
 
   Widget _buildTitleTextField() {
@@ -181,15 +189,18 @@ class _ProductEditPageState extends State<ProductEditPage> {
       title: _formData['title'],
       details: _formData['details'],
       address: _formData['address'],
-      image: 'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg',
+      image:
+          'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg',
       price: double.parse(_formData['price']),
     );
 
     if (_isNew())
-      productsModel.addProduct(product);
-    else
+      productsModel.addProduct(product).then((_) {
+        Navigator.pushNamed(context, '/product');
+      });
+    else {
       productsModel.updateProduct(productIndex, product);
-
-    Navigator.pushNamed(context, '/product');
+      Navigator.pushNamed(context, '/product');
+    }
   }
 }
