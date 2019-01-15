@@ -22,7 +22,7 @@ class ProductCard extends StatelessWidget {
               Image.asset(product.image),
               _buildProductTitleAndPriceContainer(product),
               AddressTag(product.userEmail),
-              AddressTag(product.address),
+              AddressTag(product.id != null ? product.id : 'N/A'),
               _buildButtonBar(product, model.toggleFavoriteStatus, context)
             ],
           ),

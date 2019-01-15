@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/model_registry.dart';
 import 'package:flutter_tutorial/models/users.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class ProductsModel extends RegisteredModel {
   ProductsModel(ModelRegistry modelRegistry) : super(modelRegistry) {
@@ -51,10 +53,24 @@ class ProductsModel extends RegisteredModel {
   }
 
   void addProduct(Product product) {
-    product.userId = currentUser.id;
-    product.userEmail = currentUser.email;
-    _products.add(product);
-    notifyListeners();
+    if(currentUser != null) {
+      product.userId = currentUser.id;
+      product.userEmail = currentUser.email;
+    }
+
+    http
+        .post(
+      'https://flutter-tutorial-c6c13.firebaseio.com/products.json',
+      body: json.encode(product.toMap()),
+    )
+        .then(
+      (http.Response httpResponse) {
+        final Map<String, dynamic> resp = json.decode(httpResponse.body);
+        product.id = resp['name'];
+        _products.add(product);
+        notifyListeners();
+      },
+    );
   }
 
   void deleteProduct(int index) {
@@ -74,6 +90,7 @@ class ProductsModel extends RegisteredModel {
 }
 
 class Product {
+  String id;
   final String title;
   final String details;
   final double price;
@@ -84,7 +101,8 @@ class Product {
   String userEmail;
 
   Product(
-      {@required this.title,
+      {this.id,
+      @required this.title,
       @required this.details,
       @required this.price,
       @required this.address,
@@ -99,7 +117,9 @@ class Product {
       'details': details,
       'price': price,
       'address': address,
-      'image': image
+      'image': image,
+      // 'user_id': userId,
+      // 'user_email': userEmail
     };
   }
 }
