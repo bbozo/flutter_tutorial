@@ -181,7 +181,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       title: _formData['title'],
       details: _formData['details'],
       address: _formData['address'],
-      image: 'assets/food.jpeg',
+      image: 'https://cdn.pixabay.com/photo/2015/10/02/12/00/chocolate-968457_960_720.jpg',
       price: double.parse(_formData['price']),
     );
 

@@ -6,8 +6,12 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 
 class ProductsModel extends RegisteredModel {
+  static const String PRODUCTS_URL =
+      'https://flutter-tutorial-c6c13.firebaseio.com/products.json';
+
   ProductsModel(ModelRegistry modelRegistry) : super(modelRegistry) {
-    seed();
+    fetchProducts();
+    notifyListeners();
   }
 
   static ProductsModel of(BuildContext context) =>
@@ -32,35 +36,39 @@ class ProductsModel extends RegisteredModel {
     notifyListeners();
   }
 
-  void seed() {
-    _products.add(Product(
-        title: 'Choccolate',
-        image: 'assets/food.jpeg',
-        price: 25.5,
-        details: 'Choccolate description in\nmultiple lines.',
-        address: 'Union Square, San Francisco',
-        userEmail: 'wii@user.com',
-        userId: 'abcdef'));
-    _products.add(Product(
-        title: 'Cookies',
-        image: 'assets/food.jpeg',
-        price: 15.5,
-        details: 'Cookies description in\nmultiple lines.\nAnd more lines.',
-        address: 'Union Square, San Francisco',
-        userEmail: 'wii@user.com',
-        userId: 'abcdef'));
-    notifyListeners();
+  void fetchProducts() {
+    http.get(PRODUCTS_URL).then((http.Response httpResponse) {
+      print(httpResponse.body);
+
+      Map<String, dynamic> response = json.decode(httpResponse.body);
+      _products = [];
+      response.forEach((String id, dynamic mapobj) {
+        Map<String, dynamic> map = mapobj as Map<String, dynamic>;
+        final product = Product(
+          id: id,
+          address: map['address'] ?? 'N/A',
+          details: map['details'] ?? 'N/A',
+          image: map['image'] ?? 'N/A',
+          price: map['price'].toDouble() ?? null,
+          title: map['title'] ?? 'N/A',
+          isFavorite: map['is_favorite'] ?? false,
+          userEmail: map['user_email'] ?? 'N/A',
+          userId: map['user_id'] ?? 'N/A',
+        );
+        _products.add(product);
+      });
+    });
   }
 
   void addProduct(Product product) {
-    if(currentUser != null) {
+    if (currentUser != null) {
       product.userId = currentUser.id;
       product.userEmail = currentUser.email;
     }
 
     http
         .post(
-      'https://flutter-tutorial-c6c13.firebaseio.com/products.json',
+      PRODUCTS_URL,
       body: json.encode(product.toMap()),
     )
         .then(
