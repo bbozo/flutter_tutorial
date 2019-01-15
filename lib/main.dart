@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/models/model_registry.dart';
 import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/models/users.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -60,8 +61,13 @@ class _MyAppState extends State<MyApp> {
       },
     );
 
-    rv = ScopedModel<UsersModel>(model: UsersModel(), child: rv);
-    rv = ScopedModel<ProductsModel>(model: ProductsModel(), child: rv);
+    ModelRegistry modelRegistry = ModelRegistry();
+
+    modelRegistry.register('users', UsersModel(modelRegistry));
+    rv = ScopedModel<UsersModel>(model: modelRegistry['users'], child: rv);
+
+    modelRegistry.register('products', ProductsModel(modelRegistry));
+    rv = ScopedModel<ProductsModel>(model: modelRegistry['products'], child: rv);
 
     return rv;
   }

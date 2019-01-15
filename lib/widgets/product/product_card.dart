@@ -21,6 +21,7 @@ class ProductCard extends StatelessWidget {
             children: <Widget>[
               Image.asset(product.image),
               _buildProductTitleAndPriceContainer(product),
+              AddressTag(product.userEmail),
               AddressTag(product.address),
               _buildButtonBar(product, model.toggleFavoriteStatus, context)
             ],
