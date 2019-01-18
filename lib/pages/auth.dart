@@ -56,7 +56,7 @@ class AuthPageState extends State<AuthPage> {
   }
 
   Form _buildForm() {
-    UsersModel usersModel = UsersModel.of(context);
+    UsersModel usersModel = UsersModel.of(context, rebuildOnChange: true);
     return Form(
       key: _formKey,
       child: Column(
@@ -71,14 +71,20 @@ class AuthPageState extends State<AuthPage> {
           SizedBox(height: 10.00),
           _buildLoginSignupSwitch(),
           SizedBox(height: 10.00),
-          RaisedButton(
-            child:
-                Text(_signUpOrLogin<String>(() => "SIGN UP", () => "LOG IN")),
-            onPressed: () => _submitForm(usersModel.login, usersModel.signup),
-          ),
+          _buildSubmitButton(usersModel),
         ],
       ),
     );
+  }
+
+  Widget _buildSubmitButton(UsersModel usersModel) {
+    if (usersModel.isLoading)
+      return CircularProgressIndicator();
+    else
+      return RaisedButton(
+        child: Text(_signUpOrLogin<String>(() => "SIGN UP", () => "LOG IN")),
+        onPressed: () => _submitForm(usersModel.login, usersModel.signup),
+      );
   }
 
   BoxDecoration _buildMainContainerDecoration() {
@@ -158,11 +164,12 @@ class AuthPageState extends State<AuthPage> {
       () => signup(_formData['email'], _formData['password']),
       () => login(_formData['email'], _formData['password']),
     );
-    
+
     if (result['success'])
       Navigator.pushReplacementNamed(context, '/product');
     else
-      h.errorDialog(context, title: 'An Error Ocurred', content: result['message']);
+      h.errorDialog(context,
+          title: 'An Error Ocurred', content: result['message']);
   }
 
   T _signUpOrLogin<T>(Function signUp, Function login) {

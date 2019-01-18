@@ -9,12 +9,14 @@ import 'package:flutter_tutorial/widgets/helpers/application_helpers.dart' as h;
 class UsersModel extends RegisteredModel {
   UsersModel(ModelRegistry modelRegistry) : super(modelRegistry);
 
-  static UsersModel of(BuildContext context) =>
-      ScopedModel.of<UsersModel>(context);
+  static UsersModel of(BuildContext context, {rebuildOnChange: false}) =>
+      ScopedModel.of<UsersModel>(context, rebuildOnChange: rebuildOnChange);
 
   User _currentUser;
+  bool _isLoading = false;
 
   User get currentUser => _currentUser;
+  bool get isLoading => _isLoading;
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     _currentUser = User(id: 'foo', email: email, password: password);
@@ -22,6 +24,7 @@ class UsersModel extends RegisteredModel {
   }
 
   Future<Map<String, dynamic>> signup(String email, String password) {
+    _setIsLoading(true);
     final Map<String, dynamic> authData = {
       'email': email,
       'password': password,
@@ -47,10 +50,12 @@ class UsersModel extends RegisteredModel {
   Map<String, dynamic> _processSuccess(Map<String, dynamic> response) {
     final Map<String, dynamic> rv = Map.of(response);
     rv.addAll({'success': true, 'message': 'Authentication succeeded!'});
+    _setIsLoading(false);
     return rv;
   }
 
   Map<String, dynamic> _errorHandler(error) {
+    _setIsLoading(false);
     if (error is FirebaseError) {
       switch (error.msg) {
         case 'EMAIL_EXISTS':
@@ -60,6 +65,13 @@ class UsersModel extends RegisteredModel {
       }
     } else
       return {'success': false, 'message': error.toString()};
+  }
+
+  void _setIsLoading(bool value, {bool setLoadingIndicator = true}) {
+    if (setLoadingIndicator) {
+      _isLoading = value;
+      notifyListeners();
+    }
   }
 }
 
