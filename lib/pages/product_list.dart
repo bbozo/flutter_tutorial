@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/pages/product_edit.dart';
-import 'package:flutter_tutorial/widgets/helpers/something_went_wrong_dialog.dart';
+import 'package:flutter_tutorial/widgets/helpers/application_helpers.dart' as h;
 import 'package:scoped_model/scoped_model.dart';
 
 class ProductListPage extends StatefulWidget {
@@ -18,7 +18,7 @@ class ProductListPageState extends State<ProductListPage> {
   void initState() {
     model = ProductsModel.of(context);
     model.fetchProducts().then((bool success) {
-      if (!success) SomethingWentWrongDialog.call(context);
+      if (!success) h.somethingWentWrongDialog(context);
     });
     super.initState();
   }

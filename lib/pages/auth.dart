@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/users.dart';
 
+import 'package:flutter_tutorial/widgets/helpers/application_helpers.dart' as h;
+
+enum AuthMode { Signup, Login }
+
 class AuthPage extends StatefulWidget {
   @override
   AuthPageState createState() {
@@ -17,6 +21,10 @@ class AuthPageState extends State<AuthPage> {
   };
 
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  final TextEditingController _passwordTextController = TextEditingController();
+
+  AuthMode _authMode = AuthMode.Login;
 
   RegExp emailRegexp = RegExp(
       r"^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,253}[a-zA-Z0-9])?)*$");
@@ -52,12 +60,17 @@ class AuthPageState extends State<AuthPage> {
                       _buildEmailTextField(),
                       SizedBox(height: 10.0),
                       _buildPasswordTextField(),
+                      h.renderIf(() => _authMode == AuthMode.Signup,
+                          () => _buildConfirmPasswordTextField()),
                       _buildShowPasswordCheckboxListTile(),
                       _buildAcceptTermsSwitchListTile(),
                       SizedBox(height: 10.00),
+                      _buildLoginSignupSwitch(),
+                      SizedBox(height: 10.00),
                       RaisedButton(
                         child: Text("LOG IN"),
-                        onPressed: () => _submitForm(UsersModel.of(context).login),
+                        onPressed: () =>
+                            _submitForm(UsersModel.of(context).login),
                       ),
                     ],
                   ),
@@ -75,7 +88,7 @@ class AuthPageState extends State<AuthPage> {
       title: Text('Accept terms'),
       value: _formData['acceptTerms'],
       onChanged: (bool value) =>
-          setState(() => _formData['acceptTerms'] = value),    
+          setState(() => _formData['acceptTerms'] = value),
     );
   }
 
@@ -92,10 +105,24 @@ class AuthPageState extends State<AuthPage> {
     return TextFormField(
       decoration: InputDecoration(
           labelText: 'Password', filled: true, fillColor: Colors.white),
+      controller: _passwordTextController,
       obscureText: !_formData['showPassword'],
       onSaved: (String value) => _formData['password'] = value,
       validator: (String value) {
         if (value != 'x') return 'Password or e-mail are not valid';
+      },
+    );
+  }
+
+  TextFormField _buildConfirmPasswordTextField() {
+    return TextFormField(
+      decoration: InputDecoration(
+          labelText: 'Confirm Password', filled: true, fillColor: Colors.white),
+      obscureText: !_formData['showPassword'],
+      onSaved: (String value) => _formData['password'] = value,
+      validator: (String value) {
+        if (value != _passwordTextController.text)
+          return "Passwords do not match.";
       },
     );
   }
@@ -121,5 +148,24 @@ class AuthPageState extends State<AuthPage> {
     print('AUTH FORM: ' + _formData.toString());
 
     Navigator.pushReplacementNamed(context, '/product');
+  }
+
+  Widget _buildLoginSignupSwitch() {
+    String text;
+    AuthMode targetAuthMode;
+
+    if (_authMode == AuthMode.Login) {
+      text = "Switch to signup";
+      targetAuthMode = AuthMode.Signup;
+    } else if (_authMode == AuthMode.Signup) {
+      text = "Switch to login";
+      targetAuthMode = AuthMode.Login;
+    } else
+      throw new Exception("WTF");
+
+    return FlatButton(
+      child: Text(text),
+      onPressed: () => setState(() => _authMode = targetAuthMode),
+    );
   }
 }
