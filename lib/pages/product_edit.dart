@@ -194,13 +194,29 @@ class _ProductEditPageState extends State<ProductEditPage> {
       price: double.parse(_formData['price']),
     );
 
+    Function navigateAway = (bool success) {
+      if (success)
+        Navigator.pushReplacementNamed(context, '/product');
+      else
+        showDialog(
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Something went wrong'),
+                content: Text('Please try again'),
+                actions: <Widget>[
+                  FlatButton(
+                    child: Text('OK'),
+                    onPressed: () => Navigator.of(context).pop(),
+                  )
+                ],
+              );
+            },
+            context: context);
+    };
+
     if (_isNew())
-      productsModel.addProduct(product).then((_) {
-        Navigator.pushNamed(context, '/product');
-      });
+      productsModel.addProduct(product).then(navigateAway);
     else
-      productsModel.updateProduct(productIndex, product).then((_) {
-        Navigator.pushNamed(context, '/product');
-      });
+      productsModel.updateProduct(productIndex, product).then(navigateAway);
   }
 }

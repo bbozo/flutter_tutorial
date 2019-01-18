@@ -61,7 +61,7 @@ class ProductsModel extends RegisteredModel {
     });
   }
 
-  Future<Null> addProduct(Product product, {bool setLoading = true}) {
+  Future<bool> addProduct(Product product, {bool setLoading = true}) {
     _setIsLoading(setLoading: setLoading);
 
     if (currentUser != null) {
@@ -76,12 +76,20 @@ class ProductsModel extends RegisteredModel {
     )
         .then(
       (http.Response httpResponse) {
+        if (httpResponse.statusCode < 200 || httpResponse.statusCode > 201) {
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
+
         final Map<String, dynamic> resp = json.decode(httpResponse.body);
         product.id = resp['name'];
         _products.add(product);
 
         _isLoading = false;
         notifyListeners();
+
+        return true;
       },
     );
   }
@@ -112,15 +120,14 @@ class ProductsModel extends RegisteredModel {
     }
 
     product = _products[index].update(product);
-    
+
     Function updateState = (Product product) {
-        _isLoading = false;
-        _products[index] = product;
-        notifyListeners();
+      _isLoading = false;
+      _products[index] = product;
+      notifyListeners();
     };
 
-    if(!setLoading)
-      updateState(product);
+    if (!setLoading) updateState(product);
 
     return http
         .put(
@@ -131,18 +138,15 @@ class ProductsModel extends RegisteredModel {
       (http.Response httpResponse) {
         final Map<String, dynamic> resp = json.decode(httpResponse.body);
         Product product = Product.fromMap(resp);
-        if(setLoading)
-          updateState(product);
+        if (setLoading) updateState(product);
       },
     );
   }
 
   Future<void> toggleFavoriteStatus(int index, {bool setLoading = true}) {
     return updateProduct(
-      index,
-      Product(isFavorite: !products[index].isFavorite),
-      setLoading: setLoading
-    );
+        index, Product(isFavorite: !products[index].isFavorite),
+        setLoading: setLoading);
   }
 
   void _setIsLoading({bool setLoading = true}) {
