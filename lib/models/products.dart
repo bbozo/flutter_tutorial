@@ -38,10 +38,11 @@ class ProductsModel extends RegisteredModel {
     notifyListeners();
   }
 
-  void fetchProducts() {
+  Future<Null> fetchProducts() {
     _setIsLoading();
-    http.get('$PRODUCTS_URL.json').then((http.Response httpResponse) {
-      print(httpResponse.body);
+    
+    return http.get('$PRODUCTS_URL.json').then((http.Response httpResponse) {
+      // print(httpResponse.body);
 
       Map<String, dynamic> response = json.decode(httpResponse.body);
       _products = [];
@@ -162,7 +163,7 @@ class Product {
       this.isFavorite = false});
 
   static Product fromMap(Map<String, dynamic> map) {
-    print('fromMap received: ${map.toString()}');
+    // print('fromMap received: ${map.toString()}');
     return Product(
       id: map['id'],
       title: map['title'],

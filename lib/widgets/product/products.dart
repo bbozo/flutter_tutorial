@@ -4,25 +4,24 @@ import 'package:flutter_tutorial/widgets/product/product_card.dart';
 import 'package:scoped_model/scoped_model.dart';
 
 class Products extends StatelessWidget {
-  
-  Widget _buildProductList(BuildContext context, List<Product> products) {       
+  Widget _buildProductList(BuildContext context, List<Product> products) {
     Widget rv;
     ProductsModel model = ProductsModel.of(context);
 
     if (model.isLoading)
       rv = Center(child: rv = CircularProgressIndicator());
-
     else if (products.length == 0)
       rv = Center(child: Text("No products found, please add some"));
-
     else
       rv = ListView.builder(
-        itemBuilder: (BuildContext context, int index) =>
-            ProductCard(index),
+        itemBuilder: (BuildContext context, int index) => ProductCard(index),
         itemCount: products.length,
       );
 
-    return rv;
+    return RefreshIndicator(
+      child: rv,
+      onRefresh: model.fetchProducts,
+    );
   }
 
   @override
