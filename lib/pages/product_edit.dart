@@ -199,7 +199,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       if (success)
         Navigator.pushReplacementNamed(context, '/product');
       else
-        h.somethingWentWrongDialog(context);
+        h.errorDialog(context);
     };
 
     if (_isNew())

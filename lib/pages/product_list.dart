@@ -18,7 +18,7 @@ class ProductListPageState extends State<ProductListPage> {
   void initState() {
     model = ProductsModel.of(context);
     model.fetchProducts().then((bool success) {
-      if (!success) h.somethingWentWrongDialog(context);
+      if (!success) h.errorDialog(context);
     });
     super.initState();
   }
