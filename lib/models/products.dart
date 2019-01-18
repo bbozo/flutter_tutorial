@@ -9,10 +9,7 @@ class ProductsModel extends RegisteredModel {
   static const String PRODUCTS_URL =
       'https://flutter-tutorial-c6c13.firebaseio.com/products';
 
-  ProductsModel(ModelRegistry modelRegistry) : super(modelRegistry) {
-    fetchProducts();
-    notifyListeners();
-  }
+  ProductsModel(ModelRegistry modelRegistry) : super(modelRegistry);
 
   static ProductsModel of(BuildContext context) =>
       ScopedModel.of<ProductsModel>(context);
@@ -25,6 +22,7 @@ class ProductsModel extends RegisteredModel {
   bool get showFavorites => _showFavorites;
   User get currentUser => (modelRegistry['users'] as UsersModel).currentUser;
   bool get isLoading => _isLoading;
+  String get userToken => currentUser.token;
 
   List<Product> get displayedProducts {
     if (_showFavorites)
@@ -42,7 +40,7 @@ class ProductsModel extends RegisteredModel {
     _setIsLoading(setLoading: setLoading);
 
     return http
-        .get('$PRODUCTS_URL.json')
+        .get('$PRODUCTS_URL.json?auth=$userToken')
         .then(_validateHttpResponse)
         .then((http.Response httpResponse) {
       print(httpResponse.body);
@@ -84,7 +82,7 @@ class ProductsModel extends RegisteredModel {
 
     try {
       final http.Response httpResponse = await http.post(
-        '$PRODUCTS_URL.json',
+        '$PRODUCTS_URL.json?auth=$userToken',
         body: json.encode(product.toMap()),
       );
 
@@ -110,7 +108,7 @@ class ProductsModel extends RegisteredModel {
 
     return http
         .delete(
-          '$PRODUCTS_URL/${product.id}.json',
+          '$PRODUCTS_URL/${product.id}.json?auth=$userToken',
         )
         .then(_validateHttpResponse)
         .then((http.Response resp) {
@@ -143,7 +141,7 @@ class ProductsModel extends RegisteredModel {
 
     return http
         .put(
-          '$PRODUCTS_URL/${product.id}.json',
+          '$PRODUCTS_URL/${product.id}.json?auth=$userToken',
           body: json.encode(product.toMap()),
         )
         .then(_validateHttpResponse)

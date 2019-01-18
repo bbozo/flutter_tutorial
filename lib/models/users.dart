@@ -32,10 +32,8 @@ class UsersModel extends RegisteredModel {
             body: json.encode(authData))
         .then(_processResult)
         .then(_processSuccess)
-        .then((rv) {
-      _currentUser = User(id: 'foo', email: email, password: password);
-      return rv;
-    }).catchError(_errorHandler);
+        .then(_setCurrentUser)
+        .catchError(_errorHandler);
   }
 
   Future<Map<String, dynamic>> signup(String email, String password) {
@@ -52,6 +50,7 @@ class UsersModel extends RegisteredModel {
             body: json.encode(authData))
         .then(_processResult)
         .then(_processSuccess)
+        .then(_setCurrentUser)
         .catchError(_errorHandler);
   }
 
@@ -88,6 +87,11 @@ class UsersModel extends RegisteredModel {
       return {'success': false, 'message': error.toString()};
   }
 
+  Map<String, dynamic> _setCurrentUser(Map<String, dynamic> rv) {
+    _currentUser = User(id: rv['localId'], email: rv['email'], token: rv['idToken']);
+    return rv;
+  }
+
   void _setIsLoading(bool value, {bool setLoadingIndicator = true}) {
     if (setLoadingIndicator) {
       _isLoading = value;
@@ -104,11 +108,7 @@ class FirebaseError implements Exception {
 class User {
   final String id;
   final String email;
-  final String password;
+  final String token;
 
-  User({
-    @required this.id,
-    @required this.email,
-    @required this.password,
-  });
+  User({@required this.id, @required this.email, @required this.token});
 }

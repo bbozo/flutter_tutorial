@@ -121,6 +121,7 @@ class AuthPageState extends State<AuthPage> {
       decoration: InputDecoration(
           labelText: 'Password', filled: true, fillColor: Colors.white),
       controller: _passwordTextController,
+      // initialValue: 'xxxxxx',
       obscureText: !_formData['showPassword'],
       onSaved: (String value) => _formData['password'] = value,
       validator: (String value) {},
@@ -145,6 +146,7 @@ class AuthPageState extends State<AuthPage> {
       decoration: InputDecoration(
           labelText: 'E-mail', filled: true, fillColor: Colors.white),
       keyboardType: TextInputType.emailAddress,
+      initialValue: 'xx@xx.xx',
       onSaved: (String value) => _formData['email'] = value,
       validator: (String value) {
         if (value.isEmpty || !emailRegexp.hasMatch(value))
