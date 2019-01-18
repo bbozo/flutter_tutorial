@@ -74,7 +74,7 @@ class ProductsModel extends RegisteredModel {
     return httpResponse;
   }
 
-  Future<bool> addProduct(Product product, {bool setLoading = true}) {
+  Future<bool> addProduct(Product product, {bool setLoading = true}) async {
     _setIsLoading(setLoading: setLoading);
 
     if (currentUser != null) {
@@ -82,24 +82,25 @@ class ProductsModel extends RegisteredModel {
       product.userEmail = currentUser.email;
     }
 
-    return http
-        .post(
-          '$PRODUCTS_URL.json',
-          body: json.encode(product.toMap()),
-        )
-        .then(_validateHttpResponse)
-        .then(
-      (http.Response httpResponse) {
-        final Map<String, dynamic> resp = json.decode(httpResponse.body);
-        product.id = resp['name'];
-        _products.add(product);
+    try {
+      final http.Response httpResponse = await http.post(
+        '$PRODUCTS_URL.json',
+        body: json.encode(product.toMap()),
+      );
 
-        _isLoading = false;
-        notifyListeners();
+      _validateHttpResponse(httpResponse);
 
-        return true;
-      },
-    ).catchError(_errorHandler);
+      final Map<String, dynamic> resp = json.decode(httpResponse.body);
+      product.id = resp['name'];
+      _products.add(product);
+
+      _isLoading = false;
+      notifyListeners();
+
+      return true;
+    } catch (error) {
+      return _errorHandler(error);
+    }
   }
 
   Future<bool> deleteProduct(int index, {bool setLoading = true}) {
