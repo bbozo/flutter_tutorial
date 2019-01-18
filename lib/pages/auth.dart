@@ -38,14 +38,7 @@ class AuthPageState extends State<AuthPage> {
       appBar: AppBar(title: Text('Login')),
       body: Container(
         margin: EdgeInsets.all(10.0),
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            fit: BoxFit.cover,
-            colorFilter: ColorFilter.mode(
-                Colors.black.withOpacity(.3), BlendMode.dstATop),
-            image: AssetImage('assets/background.jpg'),
-          ),
-        ),
+        decoration: _buildMainContainerDecoration(),
         child: GestureDetector(
           onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
           child: Container(
@@ -53,32 +46,48 @@ class AuthPageState extends State<AuthPage> {
             child: SingleChildScrollView(
               child: Container(
                 width: targetWidth,
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: <Widget>[
-                      _buildEmailTextField(),
-                      SizedBox(height: 10.0),
-                      _buildPasswordTextField(),
-                      h.renderIf(() => _authMode == AuthMode.Signup,
-                          () => _buildConfirmPasswordTextField()),
-                      _buildShowPasswordCheckboxListTile(),
-                      _buildAcceptTermsSwitchListTile(),
-                      SizedBox(height: 10.00),
-                      _buildLoginSignupSwitch(),
-                      SizedBox(height: 10.00),
-                      RaisedButton(
-                        child: Text("LOG IN"),
-                        onPressed: () =>
-                            _submitForm(UsersModel.of(context).login),
-                      ),
-                    ],
-                  ),
-                ),
+                child: _buildForm(),
               ),
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Form _buildForm() {
+    UsersModel usersModel = UsersModel.of(context);
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: <Widget>[
+          _buildEmailTextField(),
+          SizedBox(height: 10.0),
+          _buildPasswordTextField(),
+          _signUpOrLogin<Widget>(
+              () => _buildConfirmPasswordTextField(), () => Container()),
+          _buildShowPasswordCheckboxListTile(),
+          _buildAcceptTermsSwitchListTile(),
+          SizedBox(height: 10.00),
+          _buildLoginSignupSwitch(),
+          SizedBox(height: 10.00),
+          RaisedButton(
+            child:
+                Text(_signUpOrLogin<String>(() => "SIGN UP", () => "LOG IN")),
+            onPressed: () => _submitForm(usersModel.login, usersModel.signup),
+          ),
+        ],
+      ),
+    );
+  }
+
+  BoxDecoration _buildMainContainerDecoration() {
+    return BoxDecoration(
+      image: DecorationImage(
+        fit: BoxFit.cover,
+        colorFilter:
+            ColorFilter.mode(Colors.black.withOpacity(.3), BlendMode.dstATop),
+        image: AssetImage('assets/background.jpg'),
       ),
     );
   }
@@ -108,9 +117,7 @@ class AuthPageState extends State<AuthPage> {
       controller: _passwordTextController,
       obscureText: !_formData['showPassword'],
       onSaved: (String value) => _formData['password'] = value,
-      validator: (String value) {
-        if (value != 'x') return 'Password or e-mail are not valid';
-      },
+      validator: (String value) {},
     );
   }
 
@@ -140,28 +147,44 @@ class AuthPageState extends State<AuthPage> {
     );
   }
 
-  void _submitForm(Function login) {
+  void _submitForm(Function login, Function signup) async {
     if (!_formKey.currentState.validate() || !_formData['acceptTerms']) return;
 
     _formKey.currentState.save();
-    login(_formData['email'], _formData['password']);
     print('AUTH FORM: ' + _formData.toString());
 
-    Navigator.pushReplacementNamed(context, '/product');
+    final Map<String, dynamic> result =
+        await _signUpOrLogin<Future<Map<String, dynamic>>>(
+      () => signup(_formData['email'], _formData['password']),
+      () => login(_formData['email'], _formData['password']),
+    );
+    
+    if (result['success'])
+      Navigator.pushReplacementNamed(context, '/product');
+    else
+      h.errorDialog(context, title: 'An Error Ocurred', content: result['message']);
+  }
+
+  T _signUpOrLogin<T>(Function signUp, Function login) {
+    if (_authMode == AuthMode.Login)
+      return login();
+    else if (_authMode == AuthMode.Signup)
+      return signUp();
+    else
+      throw new Exception("WTF");
   }
 
   Widget _buildLoginSignupSwitch() {
     String text;
     AuthMode targetAuthMode;
 
-    if (_authMode == AuthMode.Login) {
-      text = "Switch to signup";
-      targetAuthMode = AuthMode.Signup;
-    } else if (_authMode == AuthMode.Signup) {
+    _signUpOrLogin(() {
       text = "Switch to login";
       targetAuthMode = AuthMode.Login;
-    } else
-      throw new Exception("WTF");
+    }, () {
+      text = "Switch to signup";
+      targetAuthMode = AuthMode.Signup;
+    });
 
     return FlatButton(
       child: Text(text),

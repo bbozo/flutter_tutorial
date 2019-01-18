@@ -7,12 +7,12 @@ Widget renderIf(Function condition, Function builder) {
     return Container();
 }
 
-Future<dynamic> somethingWentWrongDialog(BuildContext context) {
+Future<dynamic> errorDialog(BuildContext context, {title: 'Something went wrong', content: 'Please try again'}) {
   return showDialog(
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Something went wrong'),
-          content: Text('Please try again'),
+          title: Text(title),
+          content: Text(content),
           actions: <Widget>[
             FlatButton(
               child: Text('OK'),
@@ -23,3 +23,12 @@ Future<dynamic> somethingWentWrongDialog(BuildContext context) {
       },
       context: context);
 }
+
+Map<String, dynamic> firebaseConfig = {
+  'apiKey': "AIzaSyCbX5cIrZBm4optQIjFB-NnLtZPnmz8-sE",
+  'authDomain': "flutter-tutorial-c6c13.firebaseapp.com",
+  'databaseURL': "https://flutter-tutorial-c6c13.firebaseio.com",
+  'projectId': "flutter-tutorial-c6c13",
+  'storageBucket': "flutter-tutorial-c6c13.appspot.com",
+  'messagingSenderId': "875516715108"
+};
