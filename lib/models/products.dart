@@ -45,7 +45,7 @@ class ProductsModel extends RegisteredModel {
         .get('$PRODUCTS_URL.json')
         .then(_validateHttpResponse)
         .then((http.Response httpResponse) {
-      // print(httpResponse.body);
+      print(httpResponse.body);
 
       Map<String, dynamic> response = json.decode(httpResponse.body);
       _products = [];
@@ -67,8 +67,10 @@ class ProductsModel extends RegisteredModel {
   }
 
   http.Response _validateHttpResponse(http.Response httpResponse) {
+    print("validating http response $httpResponse");
     if (httpResponse.statusCode < 200 || httpResponse.statusCode > 201)
       throw new Exception("invalid response from server");
+    print("  all OK");
     return httpResponse;
   }
 
@@ -170,6 +172,7 @@ class ProductsModel extends RegisteredModel {
   bool _errorHandler(error) {
     _isLoading = false;
     notifyListeners();
+    print("ERROR!! $error");
     return false;
   }
 }

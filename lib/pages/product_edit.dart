@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/products.dart';
+import 'package:flutter_tutorial/widgets/helpers/something_went_wrong_dialog.dart';
 
 import '../widgets/helpers/ensure-visible.dart';
 import 'package:scoped_model/scoped_model.dart';
@@ -198,20 +199,7 @@ class _ProductEditPageState extends State<ProductEditPage> {
       if (success)
         Navigator.pushReplacementNamed(context, '/product');
       else
-        showDialog(
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Something went wrong'),
-                content: Text('Please try again'),
-                actions: <Widget>[
-                  FlatButton(
-                    child: Text('OK'),
-                    onPressed: () => Navigator.of(context).pop(),
-                  )
-                ],
-              );
-            },
-            context: context);
+        SomethingWentWrongDialog.call(context);
     };
 
     if (_isNew())
