@@ -38,10 +38,13 @@ class ProductsModel extends RegisteredModel {
     notifyListeners();
   }
 
-  Future<Null> fetchProducts({bool setLoading = true}) {
+  Future<bool> fetchProducts({bool setLoading = true}) {
     _setIsLoading(setLoading: setLoading);
 
-    return http.get('$PRODUCTS_URL.json').then((http.Response httpResponse) {
+    return http
+        .get('$PRODUCTS_URL.json')
+        .then(_validateHttpResponse)
+        .then((http.Response httpResponse) {
       // print(httpResponse.body);
 
       Map<String, dynamic> response = json.decode(httpResponse.body);
@@ -58,7 +61,15 @@ class ProductsModel extends RegisteredModel {
 
       _isLoading = false;
       notifyListeners();
-    });
+
+      return true;
+    }).catchError(_errorHandler);
+  }
+
+  http.Response _validateHttpResponse(http.Response httpResponse) {
+    if (httpResponse.statusCode < 200 || httpResponse.statusCode > 201)
+      throw new Exception("invalid response from server");
+    return httpResponse;
   }
 
   Future<bool> addProduct(Product product, {bool setLoading = true}) {
@@ -71,17 +82,12 @@ class ProductsModel extends RegisteredModel {
 
     return http
         .post(
-      '$PRODUCTS_URL.json',
-      body: json.encode(product.toMap()),
-    )
+          '$PRODUCTS_URL.json',
+          body: json.encode(product.toMap()),
+        )
+        .then(_validateHttpResponse)
         .then(
       (http.Response httpResponse) {
-        if (httpResponse.statusCode < 200 || httpResponse.statusCode > 201) {
-          _isLoading = false;
-          notifyListeners();
-          return false;
-        }
-
         final Map<String, dynamic> resp = json.decode(httpResponse.body);
         product.id = resp['name'];
         _products.add(product);
@@ -91,26 +97,29 @@ class ProductsModel extends RegisteredModel {
 
         return true;
       },
-    );
+    ).catchError(_errorHandler);
   }
 
-  Future<Null> deleteProduct(int index, {bool setLoading = true}) {
+  Future<bool> deleteProduct(int index, {bool setLoading = true}) {
     _setIsLoading(setLoading: setLoading);
 
     Product product = _products[index];
 
     return http
         .delete(
-      '$PRODUCTS_URL/${product.id}.json',
-    )
+          '$PRODUCTS_URL/${product.id}.json',
+        )
+        .then(_validateHttpResponse)
         .then((http.Response resp) {
       _products.removeAt(index);
       _isLoading = false;
       notifyListeners();
-    });
+
+      return true;
+    }).catchError(_errorHandler);
   }
 
-  Future<Null> updateProduct(int index, Product product,
+  Future<bool> updateProduct(int index, Product product,
       {bool setLoading = true}) {
     _setIsLoading(setLoading: setLoading);
 
@@ -131,16 +140,18 @@ class ProductsModel extends RegisteredModel {
 
     return http
         .put(
-      '$PRODUCTS_URL/${product.id}.json',
-      body: json.encode(product.toMap()),
-    )
+          '$PRODUCTS_URL/${product.id}.json',
+          body: json.encode(product.toMap()),
+        )
+        .then(_validateHttpResponse)
         .then(
       (http.Response httpResponse) {
         final Map<String, dynamic> resp = json.decode(httpResponse.body);
         Product product = Product.fromMap(resp);
         if (setLoading) updateState(product);
+        return true;
       },
-    );
+    ).catchError(_errorHandler);
   }
 
   Future<void> toggleFavoriteStatus(int index, {bool setLoading = true}) {
@@ -154,6 +165,12 @@ class ProductsModel extends RegisteredModel {
       _isLoading = true;
       notifyListeners();
     }
+  }
+
+  bool _errorHandler(error) {
+    _isLoading = false;
+    notifyListeners();
+    return false;
   }
 }
 

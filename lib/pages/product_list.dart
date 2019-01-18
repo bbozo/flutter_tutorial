@@ -40,10 +40,11 @@ class ProductListPageState extends State<ProductListPage> {
           return Dismissible(
             key: Key(product.title),
             background: Container(color: Colors.red),
+            direction: DismissDirection.endToStart,
             onDismissed: (DismissDirection direction) {
               if (direction == DismissDirection.endToStart) {
                 print('swiped end->start');
-                model.deleteProduct(index);
+                model.deleteProduct(index, setLoading: false);
               } else if (direction == DismissDirection.startToEnd)
                 print('swiped start->end');
               else
