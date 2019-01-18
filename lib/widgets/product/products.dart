@@ -10,11 +10,11 @@ class Products extends StatelessWidget {
     ProductsModel model = ProductsModel.of(context);
 
     if (model.isLoading)
-      rv = CircularProgressIndicator();
+      rv = Center(child: rv = CircularProgressIndicator());
 
     else if (products.length == 0)
       rv = Center(child: Text("No products found, please add some"));
-      
+
     else
       rv = ListView.builder(
         itemBuilder: (BuildContext context, int index) =>

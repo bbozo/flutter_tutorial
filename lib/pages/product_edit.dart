@@ -198,9 +198,9 @@ class _ProductEditPageState extends State<ProductEditPage> {
       productsModel.addProduct(product).then((_) {
         Navigator.pushNamed(context, '/product');
       });
-    else {
-      productsModel.updateProduct(productIndex, product);
-      Navigator.pushNamed(context, '/product');
-    }
+    else
+      productsModel.updateProduct(productIndex, product).then((_) {
+        Navigator.pushNamed(context, '/product');
+      });
   }
 }

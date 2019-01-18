@@ -7,7 +7,7 @@ class AddressTag extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (this.address.isNotEmpty)
+    if (this.address != null && this.address.isNotEmpty)
       return Container(
           decoration: BoxDecoration(
               border: Border.all(color: Colors.grey, width: 1.0),
