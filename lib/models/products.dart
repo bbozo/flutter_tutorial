@@ -38,9 +38,9 @@ class ProductsModel extends RegisteredModel {
     notifyListeners();
   }
 
-  Future<Null> fetchProducts() {
-    _setIsLoading();
-    
+  Future<Null> fetchProducts({bool setLoading = true}) {
+    _setIsLoading(setLoading: setLoading);
+
     return http.get('$PRODUCTS_URL.json').then((http.Response httpResponse) {
       // print(httpResponse.body);
 
@@ -61,8 +61,8 @@ class ProductsModel extends RegisteredModel {
     });
   }
 
-  Future<Null> addProduct(Product product) {
-    _setIsLoading();
+  Future<Null> addProduct(Product product, {bool setLoading = true}) {
+    _setIsLoading(setLoading: setLoading);
 
     if (currentUser != null) {
       product.userId = currentUser.id;
@@ -86,8 +86,8 @@ class ProductsModel extends RegisteredModel {
     );
   }
 
-  Future<Null> deleteProduct(int index) {
-    _setIsLoading();
+  Future<Null> deleteProduct(int index, {bool setLoading = true}) {
+    _setIsLoading(setLoading: setLoading);
 
     Product product = _products[index];
 
@@ -102,8 +102,9 @@ class ProductsModel extends RegisteredModel {
     });
   }
 
-  Future<Null> updateProduct(int index, Product product) {
-    _setIsLoading();
+  Future<Null> updateProduct(int index, Product product,
+      {bool setLoading = true}) {
+    _setIsLoading(setLoading: setLoading);
 
     if (currentUser != null) {
       product.userId = currentUser.id;
@@ -111,6 +112,15 @@ class ProductsModel extends RegisteredModel {
     }
 
     product = _products[index].update(product);
+    
+    Function updateState = (Product product) {
+        _isLoading = false;
+        _products[index] = product;
+        notifyListeners();
+    };
+
+    if(!setLoading)
+      updateState(product);
 
     return http
         .put(
@@ -121,22 +131,25 @@ class ProductsModel extends RegisteredModel {
       (http.Response httpResponse) {
         final Map<String, dynamic> resp = json.decode(httpResponse.body);
         Product product = Product.fromMap(resp);
-
-        _isLoading = false;
-        _products[index] = product;
-        notifyListeners();
+        if(setLoading)
+          updateState(product);
       },
     );
   }
 
-  void toggleFavoriteStatus(int index) {
-    _products[index].isFavorite = !products[index].isFavorite;
-    notifyListeners();
+  Future<void> toggleFavoriteStatus(int index, {bool setLoading = true}) {
+    return updateProduct(
+      index,
+      Product(isFavorite: !products[index].isFavorite),
+      setLoading: setLoading
+    );
   }
 
-  void _setIsLoading() {
-    _isLoading = true;
-    notifyListeners();
+  void _setIsLoading({bool setLoading = true}) {
+    if (setLoading) {
+      _isLoading = true;
+      notifyListeners();
+    }
   }
 }
 
@@ -153,11 +166,11 @@ class Product {
 
   Product(
       {this.id,
-      @required this.title,
-      @required this.details,
-      @required this.price,
-      @required this.address,
-      @required this.image,
+      this.title,
+      this.details,
+      this.price,
+      this.address,
+      this.image,
       this.userId,
       this.userEmail,
       this.isFavorite = false});

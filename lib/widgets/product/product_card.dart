@@ -52,7 +52,7 @@ class ProductCard extends StatelessWidget {
               Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),
           color: Colors.red,
           onPressed: () {
-            toggleFavorite(productIndex);
+            toggleFavorite(productIndex, setLoading: false);
           },
         ),
       ],
