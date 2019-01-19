@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/products.dart';
-import 'package:flutter_tutorial/widgets/product/products.dart';
+import 'package:flutter_tutorial/widgets/product/product_card.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/sidebar.dart' as sidebar;
 
@@ -48,11 +48,32 @@ class ProductsPageState extends State<ProductsPage> {
           // a container of it's own. Container is fixed in size, Expandable is the way to go.
           body: Column(
             children: <Widget>[
-              Expanded(child: Products()),
+              Expanded(child: _buildProductList(context, model.displayedProducts)),
             ],
           ),
         );
       },
     );
   }
+
+  Widget _buildProductList(BuildContext context, List<Product> products) {
+    Widget rv;
+    ProductsModel model = ProductsModel.of(context);
+
+    if (model.isLoading)
+      rv = Center(child: rv = CircularProgressIndicator());
+    else if (products.length == 0)
+      rv = Center(child: Text("No products found, please add some"));
+    else
+      rv = ListView.builder(
+        itemBuilder: (BuildContext context, int index) => ProductCard(index),
+        itemCount: products.length,
+      );
+
+    return RefreshIndicator(
+      child: rv,
+      onRefresh: model.fetchProducts,
+    );
+  }
+
 }
