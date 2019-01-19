@@ -6,6 +6,8 @@ import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_tutorial/widgets/helpers/application_helpers.dart' as h;
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 class UsersModel extends RegisteredModel {
   UsersModel(ModelRegistry modelRegistry) : super(modelRegistry);
 
@@ -17,6 +19,27 @@ class UsersModel extends RegisteredModel {
 
   User get currentUser => _currentUser;
   bool get isLoading => _isLoading;
+
+  void autoAuthenticate() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String token = prefs.getString('current-user/token');
+    String email = prefs.getString('current-user/email');
+    String id = prefs.getString('current-user/id');
+    if (token != null) {
+      _currentUser = User(email: email, id: id, token: token);
+      notifyListeners();
+    }
+  }
+
+  Future<Null> logout() {
+    return SharedPreferences.getInstance().then((SharedPreferences prefs) {
+      prefs.remove('current-user/token');
+      prefs.remove('current-user/email');
+      prefs.remove('current-user/id');
+      _currentUser = null;
+      notifyListeners();
+    });
+  }
 
   Future<Map<String, dynamic>> login(String email, String password) {
     _setIsLoading(true);
@@ -87,8 +110,15 @@ class UsersModel extends RegisteredModel {
       return {'success': false, 'message': error.toString()};
   }
 
-  Map<String, dynamic> _setCurrentUser(Map<String, dynamic> rv) {
-    _currentUser = User(id: rv['localId'], email: rv['email'], token: rv['idToken']);
+  Future<Map<String, dynamic>> _setCurrentUser(Map<String, dynamic> rv) async {
+    final String token = rv['idToken'];
+    _currentUser = User(id: rv['localId'], email: rv['email'], token: token);
+
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('current-user/token', _currentUser.token);
+    prefs.setString('current-user/id', _currentUser.id);
+    prefs.setString('current-user/email', _currentUser.email);
+
     return rv;
   }
 

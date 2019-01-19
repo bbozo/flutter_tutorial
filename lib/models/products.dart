@@ -22,7 +22,7 @@ class ProductsModel extends RegisteredModel {
   bool get showFavorites => _showFavorites;
   User get currentUser => (modelRegistry['users'] as UsersModel).currentUser;
   bool get isLoading => _isLoading;
-  String get userToken => currentUser.token;
+  String get userToken => currentUser?.token;
 
   List<Product> get displayedProducts {
     if (_showFavorites)

@@ -25,16 +25,20 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
+  final ModelRegistry _modelRegistry = ModelRegistry();
+
   @override
   Widget build(BuildContext context) {
     Widget rv;
+    UsersModel usersModel = UsersModel(_modelRegistry);
+    usersModel.autoAuthenticate();
     
     rv = MaterialApp(
       // debugShowMaterialGrid: true, // shows a grid in which material positions objects
       // home: AuthPage(),
       theme: _buildThemeData(),
       routes: {
-        '/': (BuildContext context) => AuthPage(),
+        '/': (BuildContext context) => UsersModel.of(context, rebuildOnChange: true).currentUser == null ? AuthPage() : ProductsPage(),
         '/product': (BuildContext context) => ProductsPage(),
         '/admin': (BuildContext context) => ProductAdminPage(),
       },
@@ -61,13 +65,11 @@ class _MyAppState extends State<MyApp> {
       },
     );
 
-    ModelRegistry modelRegistry = ModelRegistry();
+    _modelRegistry.register('users', usersModel);
+    rv = ScopedModel<UsersModel>(model: _modelRegistry['users'], child: rv);
 
-    modelRegistry.register('users', UsersModel(modelRegistry));
-    rv = ScopedModel<UsersModel>(model: modelRegistry['users'], child: rv);
-
-    modelRegistry.register('products', ProductsModel(modelRegistry));
-    rv = ScopedModel<ProductsModel>(model: modelRegistry['products'], child: rv);
+    _modelRegistry.register('products', ProductsModel(_modelRegistry));
+    rv = ScopedModel<ProductsModel>(model: _modelRegistry['products'], child: rv);
 
     return rv;
   }

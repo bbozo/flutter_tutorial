@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import './product_list.dart';
 import './product_edit.dart';
+import 'package:flutter_tutorial/widgets/ui_elements/sidebar.dart' as sidebar;
 
 class ProductAdminPage extends StatelessWidget {
   @override
@@ -8,21 +9,12 @@ class ProductAdminPage extends StatelessWidget {
     return DefaultTabController(
         length: 2,
         child: Scaffold(
-          drawer: Drawer(
-              child: Column(
+          drawer: sidebar.SidebarDrawer(
             children: <Widget>[
-              AppBar(title: Text('Choose'), automaticallyImplyLeading: false),
-              ListTile(
-                leading: Icon(Icons.shop),
-                title: Text('All Products'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(
-                      context,
-                      '/product');
-                },
-              ),
+              sidebar.AllProductsLink(),
+              sidebar.LogoutLink(),
             ],
-          )),
+          ),
           appBar: AppBar(
             title: Text('Manage Products'),
             bottom: TabBar(
@@ -35,7 +27,7 @@ class ProductAdminPage extends StatelessWidget {
           body: TabBarView(
             children: <Widget>[
               ProductEditPage(),
-              ProductListPage()
+              ProductListPage(),
             ],
           ),
         ));

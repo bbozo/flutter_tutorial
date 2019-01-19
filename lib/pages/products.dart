@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/widgets/product/products.dart';
 import 'package:scoped_model/scoped_model.dart';
+import 'package:flutter_tutorial/widgets/ui_elements/sidebar.dart' as sidebar;
 
 class ProductsPage extends StatefulWidget {
   @override
@@ -22,24 +23,19 @@ class ProductsPageState extends State<ProductsPage> {
     return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {
         return Scaffold(
-          drawer: Drawer(
-              child: Column(
+          drawer: sidebar.SidebarDrawer(
             children: <Widget>[
-              AppBar(title: Text('Choose'), automaticallyImplyLeading: false),
-              ListTile(
-                leading: Icon(Icons.edit),
-                title: Text('Manage Products'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/admin');
-                },
-              ),
+              sidebar.ManageProductsLink(),
+              sidebar.LogoutLink(),
             ],
-          )),
+          ),
           appBar: AppBar(
             title: Text('EasyList'),
             actions: <Widget>[
               IconButton(
-                icon: Icon(model.showFavorites ? Icons.favorite : Icons.favorite_border),
+                icon: Icon(model.showFavorites
+                    ? Icons.favorite
+                    : Icons.favorite_border),
                 onPressed: () {
                   model.toggleShowFavorites();
                 },
