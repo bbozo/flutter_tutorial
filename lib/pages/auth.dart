@@ -83,7 +83,7 @@ class AuthPageState extends State<AuthPage> {
     else
       return RaisedButton(
         child: Text(_signUpOrLogin<String>(() => "SIGN UP", () => "LOG IN")),
-        onPressed: () => _submitForm(usersModel.login, usersModel.signup),
+        onPressed: () => _submitForm(usersModel.loginOnline, usersModel.signup),
       );
   }
 
@@ -168,7 +168,7 @@ class AuthPageState extends State<AuthPage> {
     );
 
     if (result['success'])
-      Navigator.pushReplacementNamed(context, '/product');
+      Navigator.pushReplacementNamed(context, '/');
     else
       h.errorDialog(context,
           title: 'An Error Ocurred', content: result['message']);

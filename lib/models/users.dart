@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -7,8 +8,14 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_tutorial/widgets/helpers/application_helpers.dart' as h;
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:rxdart/subjects.dart';
 
 class UsersModel extends RegisteredModel {
+  Timer _authTimer;
+
+  PublishSubject<User> _currentUserSubject = PublishSubject();
+  PublishSubject<User> get currentUserSubject => _currentUserSubject;
+
   UsersModel(ModelRegistry modelRegistry) : super(modelRegistry);
 
   static UsersModel of(BuildContext context, {rebuildOnChange: false}) =>
@@ -21,27 +28,44 @@ class UsersModel extends RegisteredModel {
   bool get isLoading => _isLoading;
 
   void autoAuthenticate() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String token = prefs.getString('current-user/token');
-    String email = prefs.getString('current-user/email');
-    String id = prefs.getString('current-user/id');
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final String token = prefs.getString('current-user/token');
+    final String email = prefs.getString('current-user/email');
+    final String id = prefs.getString('current-user/id');
+    final String expirationTimeString =
+        prefs.get('current-user/expiration_time');
     if (token != null) {
-      _currentUser = User(email: email, id: id, token: token);
-      notifyListeners();
+      final DateTime now = DateTime.now();
+      final expiresAt = DateTime.parse(expirationTimeString);
+      if (expiresAt.isBefore(now)) {
+        logout();
+        return;
+      }
+      _login(User(email: email, id: id, token: token, expiresAt: expiresAt));
     }
   }
 
   Future<Null> logout() {
     return SharedPreferences.getInstance().then((SharedPreferences prefs) {
+      print("LOGOUT");
       prefs.remove('current-user/token');
       prefs.remove('current-user/email');
       prefs.remove('current-user/id');
+      prefs.remove('current-user/expiration_time');
       _currentUser = null;
-      notifyListeners();
+      _currentUserSubject.add(null);
+      _authTimer?.cancel();
     });
   }
 
-  Future<Map<String, dynamic>> login(String email, String password) {
+  void _setAuthTimeout(int time) {
+    print("Logging out in $time seconds");
+    _authTimer = Timer(Duration(seconds: time), () {
+      logout();
+    });
+  }
+
+  Future<Map<String, dynamic>> loginOnline(String email, String password) {
     _setIsLoading(true);
     final Map<String, dynamic> authData = {
       'email': email,
@@ -54,8 +78,7 @@ class UsersModel extends RegisteredModel {
             "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${h.firebaseConfig['apiKey']}",
             body: json.encode(authData))
         .then(_processResult)
-        .then(_processSuccess)
-        .then(_setCurrentUser)
+        .then(_loginUserFromOnline)
         .catchError(_errorHandler);
   }
 
@@ -72,8 +95,7 @@ class UsersModel extends RegisteredModel {
             "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${h.firebaseConfig['apiKey']}",
             body: json.encode(authData))
         .then(_processResult)
-        .then(_processSuccess)
-        .then(_setCurrentUser)
+        .then(_loginUserFromOnline)
         .catchError(_errorHandler);
   }
 
@@ -82,13 +104,10 @@ class UsersModel extends RegisteredModel {
     print(rv);
     if (rv.containsKey('error'))
       throw new FirebaseError(rv['error']['message']);
-    return rv;
-  }
 
-  Map<String, dynamic> _processSuccess(Map<String, dynamic> response) {
-    final Map<String, dynamic> rv = Map.of(response);
     rv.addAll({'success': true, 'message': 'Authentication succeeded!'});
     _setIsLoading(false);
+
     return rv;
   }
 
@@ -110,16 +129,36 @@ class UsersModel extends RegisteredModel {
       return {'success': false, 'message': error.toString()};
   }
 
-  Future<Map<String, dynamic>> _setCurrentUser(Map<String, dynamic> rv) async {
-    final String token = rv['idToken'];
-    _currentUser = User(id: rv['localId'], email: rv['email'], token: token);
+  Map<String, dynamic> _loginUserFromOnline(Map<String, dynamic> rv) {
+    int expiresIn = int.parse(rv['expiresIn']);
+    final DateTime expirationTime =
+        DateTime.now().add(Duration(seconds: expiresIn));
+    rv['user'] = User(
+      id: rv['localId'],
+      email: rv['email'],
+      token: rv['idToken'],
+      expiresAt: expirationTime,
+    );
+    _login(rv['user']);
 
+    return rv;
+  }
+
+  Future<User> _login(User user) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    _currentUser = user;
     prefs.setString('current-user/token', _currentUser.token);
     prefs.setString('current-user/id', _currentUser.id);
     prefs.setString('current-user/email', _currentUser.email);
+    prefs.setString('current-user/expiration_time',
+        _currentUser.expiresAt.toIso8601String());
 
-    return rv;
+    int expiresIn = _currentUser.expiresAt.difference(DateTime.now()).inSeconds;
+    _setAuthTimeout(expiresIn);
+    _currentUserSubject.add(_currentUser);
+
+    return _currentUser;
   }
 
   void _setIsLoading(bool value, {bool setLoadingIndicator = true}) {
@@ -139,6 +178,12 @@ class User {
   final String id;
   final String email;
   final String token;
+  final DateTime expiresAt;
 
-  User({@required this.id, @required this.email, @required this.token});
+  User({
+    @required this.id,
+    @required this.email,
+    @required this.token,
+    @required this.expiresAt,
+  });
 }

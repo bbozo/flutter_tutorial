@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_tutorial/app/authenticated_app.dart';
+import 'package:flutter_tutorial/app/guest_app.dart';
 import 'package:flutter_tutorial/models/model_registry.dart';
-import 'package:flutter_tutorial/models/products.dart';
 import 'package:flutter_tutorial/models/users.dart';
-import 'package:scoped_model/scoped_model.dart';
-import 'package:flutter_tutorial/pages/product.dart';
-import 'package:flutter_tutorial/pages/product_admin.dart';
-import 'package:flutter_tutorial/pages/products.dart';
-// import 'package:flutter/rendering.dart';
 
-import './pages/auth.dart';
+// import 'package:flutter/rendering.dart';
 
 void main() {
   // debugPaintSizeEnabled = true;  // shows how and why elements fit together
@@ -25,53 +21,24 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  final ModelRegistry _modelRegistry = ModelRegistry();
+  User currentUser;
+  ModelRegistry _modelRegistry = ModelRegistry();
+
+  @override
+  void initState() {
+    UsersModel usersModel = UsersModel(_modelRegistry);
+    _modelRegistry.register('users', usersModel);
+    usersModel.autoAuthenticate();
+    usersModel.currentUserSubject.listen((user) => setState(() => currentUser = user));
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
-    Widget rv;
-    UsersModel usersModel = UsersModel(_modelRegistry);
-    usersModel.autoAuthenticate();
-    
-    rv = MaterialApp(
-      // debugShowMaterialGrid: true, // shows a grid in which material positions objects
-      // home: AuthPage(),
-      theme: _buildThemeData(),
-      routes: {
-        '/': (BuildContext context) => UsersModel.of(context, rebuildOnChange: true).currentUser == null ? AuthPage() : ProductsPage(),
-        '/product': (BuildContext context) => ProductsPage(),
-        '/admin': (BuildContext context) => ProductAdminPage(),
-      },
-      onGenerateRoute: (RouteSettings settings) {
-        final List<String> pathElements = settings.name.split('/');
-
-        if (pathElements[0] != '') return null;
-
-        if (pathElements[1] == 'product') {
-          final int index = int.parse(pathElements[2]);
-
-          return MaterialPageRoute<bool>(
-            builder: (BuildContext context) => ProductPage(index),
-          );
-        }
-
-        return null;
-      },
-      onUnknownRoute: (RouteSettings settings) {
-        print("UNKNOWN ROUTE! " + settings.name);
-        return MaterialPageRoute(
-          builder: (BuildContext context) => ProductsPage(),
-        );
-      },
-    );
-
-    _modelRegistry.register('users', usersModel);
-    rv = ScopedModel<UsersModel>(model: _modelRegistry['users'], child: rv);
-
-    _modelRegistry.register('products', ProductsModel(_modelRegistry));
-    rv = ScopedModel<ProductsModel>(model: _modelRegistry['products'], child: rv);
-
-    return rv;
+    if (currentUser == null)
+      return GuestApp(_modelRegistry, theme: _buildThemeData());
+    else
+      return AuthenticatedApp(_modelRegistry, theme: _buildThemeData());
   }
 
   ThemeData _buildThemeData() {
@@ -85,4 +52,5 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+
 }

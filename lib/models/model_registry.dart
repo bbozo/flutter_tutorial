@@ -10,8 +10,9 @@ class ModelRegistry {
 
   void register(String id, Model modelInstance) {
     if(_registry.containsKey(id))
-      throw new ArgumentError("Model " + id + " already registered");
-    _registry[id] = modelInstance;
+      print("Model " + id + " already registered");
+    else
+      _registry[id] = modelInstance;
   }
 
   Model operator[](String id) => _registry[id];
