@@ -25,8 +25,9 @@ class ProductsModel extends RegisteredModel {
   String get userToken => currentUser?.token;
 
   List<Product> get displayedProducts {
+    UsersModel usersModel = modelRegistry['users'] as UsersModel;
     if (_showFavorites)
-      return products.where((Product product) => product.isFavorite).toList();
+      return products.where((Product product) => usersModel.isFavorite(product)).toList();
     else
       return products;
   }
@@ -155,12 +156,6 @@ class ProductsModel extends RegisteredModel {
     ).catchError(_errorHandler);
   }
 
-  Future<void> toggleFavoriteStatus(int index, {bool setLoading = true}) {
-    return updateProduct(
-        index, Product(isFavorite: !products[index].isFavorite),
-        setLoading: setLoading);
-  }
-
   void _setIsLoading({bool setLoading = true}) {
     if (setLoading) {
       _isLoading = true;
@@ -183,20 +178,19 @@ class Product {
   double price;
   String address;
   String image;
-  bool isFavorite;
   String userId;
   String userEmail;
 
-  Product(
-      {this.id,
-      this.title,
-      this.details,
-      this.price,
-      this.address,
-      this.image,
-      this.userId,
-      this.userEmail,
-      this.isFavorite = false});
+  Product({
+    this.id,
+    this.title,
+    this.details,
+    this.price,
+    this.address,
+    this.image,
+    this.userId,
+    this.userEmail,
+  });
 
   static Product fromMap(Map<String, dynamic> map) {
     // print('fromMap received: ${map.toString()}');
@@ -207,7 +201,6 @@ class Product {
       price: map['price'].toDouble(),
       address: map['address'],
       image: map['image'],
-      isFavorite: map['is_favorite'] ?? false,
       userId: map['user_id'],
       userEmail: map['user_email'],
     );
@@ -221,7 +214,6 @@ class Product {
       price: alt.price ?? price,
       address: alt.address ?? address,
       image: alt.image ?? image,
-      isFavorite: alt.isFavorite ?? isFavorite,
       userId: alt.userId ?? userId,
       userEmail: alt.userEmail ?? userEmail,
     );
@@ -235,7 +227,6 @@ class Product {
       'price': price,
       'address': address,
       'image': image,
-      'is_favorite': isFavorite,
       'user_id': userId,
       'user_email': userEmail
     };

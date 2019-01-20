@@ -3,6 +3,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/model_registry.dart';
+import 'package:flutter_tutorial/models/products.dart';
 import 'package:scoped_model/scoped_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_tutorial/widgets/helpers/application_helpers.dart' as h;
@@ -21,6 +22,9 @@ class UsersModel extends RegisteredModel {
   static UsersModel of(BuildContext context, {rebuildOnChange: false}) =>
       ScopedModel.of<UsersModel>(context, rebuildOnChange: rebuildOnChange);
 
+  List<Product> get products =>
+      (modelRegistry['products'] as ProductsModel).products;
+
   User _currentUser;
   bool _isLoading = false;
 
@@ -29,29 +33,24 @@ class UsersModel extends RegisteredModel {
 
   void autoAuthenticate() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    final String token = prefs.getString('current-user/token');
-    final String email = prefs.getString('current-user/email');
-    final String id = prefs.getString('current-user/id');
-    final String expirationTimeString =
-        prefs.get('current-user/expiration_time');
-    if (token != null) {
-      final DateTime now = DateTime.now();
-      final expiresAt = DateTime.parse(expirationTimeString);
-      if (expiresAt.isBefore(now)) {
+    final String currentUserJson = prefs.getString('current-user');
+
+    if (currentUserJson != null) {
+      final Map<String, dynamic> userMap = json.decode(currentUserJson);
+      User user = User.fromMap(userMap);
+
+      if (user.expiresAt.isBefore(DateTime.now())) {
         logout();
         return;
       }
-      _login(User(email: email, id: id, token: token, expiresAt: expiresAt));
+      _login(user);
     }
   }
 
   Future<Null> logout() {
     return SharedPreferences.getInstance().then((SharedPreferences prefs) {
       print("LOGOUT");
-      prefs.remove('current-user/token');
-      prefs.remove('current-user/email');
-      prefs.remove('current-user/id');
-      prefs.remove('current-user/expiration_time');
+      prefs.remove('current-user');
       _currentUser = null;
       _currentUserSubject.add(null);
       _authTimer?.cancel();
@@ -78,6 +77,7 @@ class UsersModel extends RegisteredModel {
             "https://www.googleapis.com/identitytoolkit/v3/relyingparty/verifyPassword?key=${h.firebaseConfig['apiKey']}",
             body: json.encode(authData))
         .then(_processResult)
+        .then(_addToFirebase)
         .then(_loginUserFromOnline)
         .catchError(_errorHandler);
   }
@@ -95,6 +95,7 @@ class UsersModel extends RegisteredModel {
             "https://www.googleapis.com/identitytoolkit/v3/relyingparty/signupNewUser?key=${h.firebaseConfig['apiKey']}",
             body: json.encode(authData))
         .then(_processResult)
+        .then(_addToFirebase)
         .then(_loginUserFromOnline)
         .catchError(_errorHandler);
   }
@@ -107,6 +108,48 @@ class UsersModel extends RegisteredModel {
 
     rv.addAll({'success': true, 'message': 'Authentication succeeded!'});
     _setIsLoading(false);
+
+    return rv;
+  }
+
+  static const String USERS_URL =
+      'https://flutter-tutorial-c6c13.firebaseio.com/users';
+
+  String _usersUrl(String id, String token) =>
+      '$USERS_URL/$id.json?auth=$token}';
+
+  Future<Map<String, dynamic>> _addToFirebase(Map<String, dynamic> resp) async {
+    final Map<String, dynamic> rv = Map.of(resp);
+
+    final Map<String, dynamic> userMap = {
+      'id': resp['localId'],
+      'email': resp['email'],
+      'token': resp['idToken'],
+    };
+    final String url = _usersUrl(userMap['id'], userMap['token']);
+
+    http.Response getUserResponse = await http.get(url);
+    http.Response changeUserResponse;
+
+    Map<String, dynamic> userMapForPost = Map.of(userMap);
+    userMapForPost.remove('token');
+    if (getUserResponse.statusCode == 404)
+      changeUserResponse =
+          await http.post(url, body: json.encode(userMapForPost));
+    else if (getUserResponse.statusCode >= 200 &&
+        getUserResponse.statusCode <= 201)
+      changeUserResponse =
+          await http.put(url, body: json.encode(userMapForPost));
+    else {
+      print(getUserResponse.body);
+      throw new FirebaseError("invalid getUserResponse from firebase");
+    }
+
+    final Map<String, dynamic> response = json.decode(changeUserResponse.body);
+    print("RESPONSE " + response.toString());
+
+    User user = User.fromMap(userMap);
+    rv['user'] = user;
 
     return rv;
   }
@@ -125,8 +168,30 @@ class UsersModel extends RegisteredModel {
         default:
           return {'success': false, 'message': error.msg};
       }
-    } else
-      return {'success': false, 'message': error.toString()};
+    } else {
+      throw error;
+      // return {'success': false, 'message': error.toString()};
+    }
+  }
+
+  Future<void> toggleFavoriteStatus(int index, {bool setLoading = true}) {
+    Product product = products[index];
+    List<String> ps = currentUser.likedProducts;
+    
+    if (ps.indexOf(product.id) == -1)
+      ps.add(product.id);
+    else
+      ps.remove(product.id);
+    
+    notifyListeners();
+
+    final String url = _usersUrl(currentUser.id, currentUser.token);
+    print(currentUser.toMap());
+
+    return http
+        .put(url,
+            body: json.encode(currentUser.toMap(withoutSensitiveData: true)))
+        .then((http.Response h) => print(h.body));
   }
 
   Map<String, dynamic> _loginUserFromOnline(Map<String, dynamic> rv) {
@@ -148,11 +213,7 @@ class UsersModel extends RegisteredModel {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
 
     _currentUser = user;
-    prefs.setString('current-user/token', _currentUser.token);
-    prefs.setString('current-user/id', _currentUser.id);
-    prefs.setString('current-user/email', _currentUser.email);
-    prefs.setString('current-user/expiration_time',
-        _currentUser.expiresAt.toIso8601String());
+    prefs.setString('current-user', json.encode(_currentUser.toMap()));
 
     int expiresIn = _currentUser.expiresAt.difference(DateTime.now()).inSeconds;
     _setAuthTimeout(expiresIn);
@@ -160,6 +221,9 @@ class UsersModel extends RegisteredModel {
 
     return _currentUser;
   }
+
+  bool isFavorite(Product product) =>
+      currentUser.likedProducts.contains(product.id);
 
   void _setIsLoading(bool value, {bool setLoadingIndicator = true}) {
     if (setLoadingIndicator) {
@@ -179,11 +243,48 @@ class User {
   final String email;
   final String token;
   final DateTime expiresAt;
+  List<String> likedProducts;
+
+  static User fromMap(Map<String, dynamic> m) {
+    DateTime expiresAt =
+        m.containsKey('expires_at') ? DateTime.parse(m['expires_at']) : null;
+    List<String> likedProducts = m['liked_products'] != null
+        ? List<String>.of(m['liked_products'])
+        : List<String>();
+
+    return User(
+      id: m['id'],
+      email: m['email'],
+      token: m['token'],
+      expiresAt: expiresAt,
+      likedProducts: likedProducts,
+    );
+  }
+
+  Map<String, dynamic> toMap({bool withoutSensitiveData: false}) {
+    Map<String, dynamic> rv = {
+      'id': id,
+      'email': email,
+      'token': token,
+      'expires_at': expiresAt?.toIso8601String(),
+      'liked_products': likedProducts
+    };
+
+    if (withoutSensitiveData) {
+      rv.remove('token');
+      rv.remove('expires_at');
+    }
+
+    return rv;
+  }
 
   User({
     @required this.id,
     @required this.email,
     @required this.token,
     @required this.expiresAt,
-  });
+    this.likedProducts,
+  }) {
+    if (likedProducts == null) likedProducts = List<String>();
+  }
 }

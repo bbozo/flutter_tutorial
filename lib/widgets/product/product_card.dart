@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tutorial/models/products.dart';
+import 'package:flutter_tutorial/models/users.dart';
 import 'package:flutter_tutorial/widgets/product/address_tag.dart';
 import 'package:flutter_tutorial/widgets/product/price_tag.dart';
 import 'package:flutter_tutorial/widgets/ui_elements/default_title.dart';
@@ -12,6 +13,8 @@ class ProductCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    UsersModel usersModel = UsersModel.of(context, rebuildOnChange: true);
+
     return ScopedModelDescendant<ProductsModel>(
       builder: (BuildContext context, Widget child, ProductsModel model) {
         Product product = model.products[productIndex];
@@ -28,7 +31,7 @@ class ProductCard extends StatelessWidget {
               _buildProductTitleAndPriceContainer(product),
               AddressTag(product.userEmail),
               AddressTag(product.id != null ? product.id : 'N/A'),
-              _buildButtonBar(product, model.toggleFavoriteStatus, context)
+              _buildButtonBar(product, usersModel.toggleFavoriteStatus, context)
             ],
           ),
         );
@@ -38,6 +41,9 @@ class ProductCard extends StatelessWidget {
 
   Widget _buildButtonBar(
       Product product, Function toggleFavorite, BuildContext context) {
+    
+    UsersModel usersModel = UsersModel.of(context, rebuildOnChange: true);
+
     return ButtonBar(
       alignment: MainAxisAlignment.center,
       children: <Widget>[
@@ -48,8 +54,7 @@ class ProductCard extends StatelessWidget {
               context, '/product/' + productIndex.toString()),
         ),
         IconButton(
-          icon:
-              Icon(product.isFavorite ? Icons.favorite : Icons.favorite_border),
+          icon: Icon(usersModel.isFavorite(product) ? Icons.favorite : Icons.favorite_border),
           color: Colors.red,
           onPressed: () {
             toggleFavorite(productIndex, setLoading: false);
