@@ -17,7 +17,7 @@ class ProductListPageState extends State<ProductListPage> {
   @override
   void initState() {
     model = ProductsModel.of(context);
-    model.fetchProducts().then((bool success) {
+    model.fetchProducts(fetchOnlyForUser: true).then((bool success) {
       if (!success) h.errorDialog(context);
     });
     super.initState();

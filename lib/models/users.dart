@@ -107,7 +107,6 @@ class UsersModel extends RegisteredModel {
       throw new FirebaseError(rv['error']['message']);
 
     rv.addAll({'success': true, 'message': 'Authentication succeeded!'});
-    _setIsLoading(false);
 
     return rv;
   }
@@ -205,6 +204,9 @@ class UsersModel extends RegisteredModel {
       expiresAt: expirationTime,
     );
     _login(rv['user']);
+    
+    _setIsLoading(false);
+    notifyListeners();
 
     return rv;
   }

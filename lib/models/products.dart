@@ -27,7 +27,9 @@ class ProductsModel extends RegisteredModel {
   List<Product> get displayedProducts {
     UsersModel usersModel = modelRegistry['users'] as UsersModel;
     if (_showFavorites)
-      return products.where((Product product) => usersModel.isFavorite(product)).toList();
+      return products
+          .where((Product product) => usersModel.isFavorite(product))
+          .toList();
     else
       return products;
   }
@@ -37,11 +39,17 @@ class ProductsModel extends RegisteredModel {
     notifyListeners();
   }
 
-  Future<bool> fetchProducts({bool setLoading = true}) {
+  Future<bool> fetchProducts(
+      {bool setLoading = true, bool fetchOnlyForUser = false}) {
     _setIsLoading(setLoading: setLoading);
 
+    String url = '$PRODUCTS_URL.json?auth=$userToken';
+    if (fetchOnlyForUser)
+      url += '&orderBy="user_id"&equalTo="${currentUser.id}"';
+    print(url);
+
     return http
-        .get('$PRODUCTS_URL.json?auth=$userToken')
+        .get(url)
         .then(_validateHttpResponse)
         .then((http.Response httpResponse) {
       print(httpResponse.body);
@@ -67,8 +75,10 @@ class ProductsModel extends RegisteredModel {
 
   http.Response _validateHttpResponse(http.Response httpResponse) {
     print("validating http response $httpResponse");
-    if (httpResponse.statusCode < 200 || httpResponse.statusCode > 201)
+    if (httpResponse.statusCode < 200 || httpResponse.statusCode > 201) {
+      print("ERROR RESPONSE: ${httpResponse.body}");
       throw new Exception("invalid response from server");
+    }
     print("  all OK");
     return httpResponse;
   }
